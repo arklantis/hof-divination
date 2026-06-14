@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>信仰霸權占卜</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="reading-panel" aria-labelledby="app-title">
+      <div class="title-block">
+        <p class="eyebrow">Hegemony of Faith Divination</p>
+        <h1 id="app-title">信仰霸權占卜</h1>
+      </div>
+
+      <form id="reading-form" class="control-grid">
+        <div class="field full">
+          <span>問題類型</span>
+          <div class="topic-row" id="question-type" role="radiogroup" aria-label="問題類型">
+            <button type="button" class="topic-button active" data-type="general" aria-pressed="true">整體狀況</button>
+            <button type="button" class="topic-button" data-type="love" aria-pressed="false">感情關係</button>
+            <button type="button" class="topic-button" data-type="work" aria-pressed="false">工作事業</button>
+            <button type="button" class="topic-button" data-type="decision" aria-pressed="false">選擇決策</button>
+            <button type="button" class="topic-button" data-type="money" aria-pressed="false">金錢資源</button>
+            <button type="button" class="topic-button" data-type="self" aria-pressed="false">自我狀態</button>
+            <button type="button" class="topic-button" data-type="custom" aria-pressed="false">自訂議題</button>
+          </div>
+        </div>
+
+        <label class="field full" id="custom-topic-field" hidden>
+          <span>自訂議題</span>
+          <input id="custom-topic-input" type="text" placeholder="自行填寫你的議題">
+        </label>
+
+        <label class="field full">
+          <span>你的問題</span>
+          <textarea id="question-input" rows="3" placeholder="例如：這段關係接下來該怎麼看？"></textarea>
+        </label>
+
+        <div class="preset-row full" aria-label="快速問題">
+          <button type="button" class="preset" id="random-question-button">產生常見問題</button>
+        </div>
+        <div class="field spread-note full">
+          <span>牌陣</span>
+          <p>固定三張：局勢主軸 / 影響因素 / 建議方向</p>
+        </div>
+
+        <div class="field full">
+          <span>抽牌方式</span>
+          <div class="mode-switch" role="tablist" aria-label="抽牌方式">
+            <button type="button" class="mode-button active" data-mode="auto">網站抽牌</button>
+            <button type="button" class="mode-button" data-mode="manual">實體牌輸入</button>
+          </div>
+        </div>
+
+        <div class="empty-state auto-only full" id="idle-panel">
+          <div class="empty-card">?</div>
+          <p>先選議題，再輸入問題；也可以切到實體牌輸入模式用下拉選單選牌。</p>
+        </div>
+
+        <div class="manual-panel full" id="manual-panel" hidden>
+          <div class="manual-head">
+            <h2>實體牌輸入</h2>
+            <p>選擇你自己抽到的三張主牌與各自的信徒強度，網站會依強度推定局勢主軸、影響因素、建議方向。</p>
+          </div>
+          <div class="manual-grid" id="manual-grid">
+            <div class="manual-row">
+              <label class="field"><span>主牌 1</span><select class="manual-card" data-slot="0"></select></label>
+              <label class="field"><span>正逆位</span><select class="manual-orientation" data-slot="0"><option value="正位">正位</option><option value="逆位">逆位</option></select></label>
+              <label class="field"><span>信徒強度</span><select class="manual-believer" data-slot="0"></select></label>
+            </div>
+            <div class="manual-row">
+              <label class="field"><span>主牌 2</span><select class="manual-card" data-slot="1"></select></label>
+              <label class="field"><span>正逆位</span><select class="manual-orientation" data-slot="1"><option value="正位">正位</option><option value="逆位">逆位</option></select></label>
+              <label class="field"><span>信徒強度</span><select class="manual-believer" data-slot="1"></select></label>
+            </div>
+            <div class="manual-row">
+              <label class="field"><span>主牌 3</span><select class="manual-card" data-slot="2"></select></label>
+              <label class="field"><span>正逆位</span><select class="manual-orientation" data-slot="2"><option value="正位">正位</option><option value="逆位">逆位</option></select></label>
+              <label class="field"><span>信徒強度</span><select class="manual-believer" data-slot="2"></select></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row full">
+          <button class="primary-button" id="submit-button" type="submit">抽牌</button>
+        </div>
+      </form>
+    </section>
+    <section class="result-area" id="result-area" aria-live="polite"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
