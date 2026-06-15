@@ -1034,6 +1034,35 @@ function conclusionPhrase(item) {
     .replace(/[。！？!?]+$/, "")
     .trim();
 }
+
+const conclusionRewriteRules = [
+  [/復原可能|未必真的死透/, "還不到完全結束，仍有回復、修補或重新打開的空間"],
+  [/某些牽連已經消耗判斷|不處理就很難往前/, "真正拖住局勢的，是某些還沒清乾淨的牽連與消耗"],
+  [/回到本心|真正要什麼/, "先分清自己真正想保住、修復或放下的是什麼"],
+  [/善意支撐不足|不容易自動往好處走/, "不太能只靠善意、好運或自然發展來變好"],
+  [/人心被影響|未必只聽自己的感受/, "外界聲音正在影響判斷，事情不只看當事人自己的感受"],
+  [/帶著界線包容|讓對方有台階/, "用有界線的包容處理，不要把退讓變成自我消耗"],
+  [/說服受阻|人心還沒有過來/, "目前人心還沒真正轉過來，溝通或推進都容易卡住"],
+  [/付出很多卻沒有真正推進/, "投入不一定會換來進展，繼續加碼前要先確認方向是否有效"],
+  [/信念開始鬆動|原本相信的東西需要檢查/, "原本堅持的想法正在被檢驗，需要重新確認它還站不站得住"],
+  [/局勢混亂但有操作空間|打亂原計畫/, "局勢雖然被打亂，但仍可能從變動裡找到操作空間"],
+  [/計畫失靈|安排不一定有效/, "原本設想的安排不一定跑得動，需要重新檢查策略"],
+  [/留意訊息來源|查清背後敘事/, "先把資訊來源與背後說法查清楚，不要急著照單全收"],
+  [/外援不足|足夠資源/, "目前能動用的支援與累積還不夠，不能期待外力自動補位"],
+  [/衝突當成必須處理|選擇戰略/, "把衝突當成現實問題處理，先選戰略，不要只憑情緒出手"],
+  [/切斷與清理|明確界線/, "需要把界線、責任或不健康牽連整理清楚"],
+  [/直覺|預判|趨勢感/, "可以相信那些經過觀察後仍然穩定存在的直覺與判斷"],
+  [/前途不明|關鍵資訊尚未浮現/, "現在資訊還不完整，不適合太早把結果說死"],
+  [/結果翻轉|現況走向反面|反轉力量|翻面|不照原本方向走/, "現在看到的方向未必會照原樣走下去，局勢有翻面的可能"],
+  [/反轉失效|翻盤未成形/, "不要把希望放在預期中的翻盤上，局勢未必會照想像反轉"]
+];
+
+function conclusionIdea(item, fallbackPrefix) {
+  const phrase = conclusionPhrase(item);
+  const matched = conclusionRewriteRules.find(([pattern]) => pattern.test(phrase));
+  if (matched) return matched[1];
+  return `${fallbackPrefix}${phrase}`;
+}
 function contextSeed(item, type) {
   const seed = getSeed(item);
   if (type === "love" && seed.love) return seed.love;
@@ -1070,11 +1099,10 @@ function buildSummary(question, type, spreadKey, draws) {
   if (spreadKey !== "three") {
     return `${subject}，${displaySeedForPosition(dominant)}`;
   }
-
-  const main = conclusionPhrase(dominant);
-  const influence = interference ? conclusionPhrase(interference) : "影響因素目前不明顯";
-  const advice = exit ? conclusionPhrase(exit) : "建議方向目前不明顯";
-  return `${subject}，主要狀態是：${main}。同時需要注意：${influence}。所以目前比較適合的處理方向是：${advice}。`;
+  const main = conclusionIdea(dominant, "目前的核心傾向是：");
+  const influence = interference ? conclusionIdea(interference, "容易卡在：") : "影響因素目前不明顯";
+  const advice = exit ? conclusionIdea(exit, "先從這裡切入：") : "建議方向目前不明顯";
+  return `${subject}，這題的重點不是只看表面結果，而是${main}。不過，${influence}；如果這一段不處理，局勢很容易卡住。接下來比起重複原本做法，更適合${advice}。`;
 }
 function buildAiPrompt(question, type, spreadKey, draws, summary, mode = "compact") {
   const inferenceNote = draws.find((item) => item.inferenceNote)?.inferenceNote || "";
