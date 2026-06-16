@@ -1009,6 +1009,13 @@ let currentLanguage = "zh";
 let latestAiPrompt = "";
 let latestFullAiPrompt = "";
 
+function setSubmitVisible(visible) {
+  if (actionRow) actionRow.hidden = !visible;
+  if (!submitButton) return;
+  submitButton.hidden = !visible;
+  submitButton.style.display = visible ? "" : "none";
+}
+
 function sampleUnique(pool, count) {
   const copy = [...pool];
   const result = [];
@@ -1171,12 +1178,155 @@ const conclusionRewriteRulesEn = [
   [/反轉失效|翻盤未成形/, "do not rely on an expected turnaround; the situation may not reverse as hoped"]
 ];
 
+
+const englishMeaningSeeds = {
+  skill_01: {
+    upright: "a hidden adversary or harmful motive may be disguised as help, kindness, authority, or alliance",
+    reversed: "the hidden motive may be starting to show, but suspicion and projection also need to be checked"
+  },
+  skill_02: {
+    upright: "a high-cost sacrifice, all-in commitment, or mutual damage may define the situation",
+    reversed: "effort or devotion may be turning into wasted sacrifice without meaningful return"
+  },
+  skill_03: {
+    upright: "authority, self-rule, control, or the need to make a firm independent decision is central",
+    reversed: "control may have become arrogance, domination, coercion, or being trapped in one's own worldview"
+  },
+  skill_04: {
+    upright: "intuition, foresight, or an inner sense of the situation is likely worth trusting",
+    reversed: "intuition is unclear, the future is not revealed yet, or key information has not appeared"
+  },
+  skill_05: {
+    upright: "recovery is possible after loss, but it may still require a cost, gesture, or repair effort",
+    reversed: "what has ended may not return easily, or a seeming recovery may still hide unresolved risks"
+  },
+  skill_06: {
+    upright: "the surrounding trend, environment, or a leading person may help people rise together",
+    reversed: "the current environment may block growth, so following the trend needs careful evaluation"
+  },
+  skill_07: {
+    upright: "a long-held belief, loyalty, or stable bond is protected by strong inner conviction",
+    reversed: "a familiar belief, loyal bond, or stable habit is being tested and may need re-examination"
+  },
+  skill_08: {
+    upright: "conflict can be paused, negotiated, or kept from becoming openly destructive",
+    reversed: "surface harmony may break, and conflict or a failed agreement may become harder to avoid"
+  },
+  skill_09: {
+    upright: "the situation reflects the querent's own desire, behavior, shadow, or honest self-recognition",
+    reversed: "the querent may be losing touch with the original intention, true desire, or sense of self"
+  },
+  skill_10: {
+    upright: "past resources, old contacts, and accumulated groundwork can be called upon for support",
+    reversed: "available support is limited because the foundation or past investment may not be enough"
+  },
+  skill_11: {
+    upright: "an unhealthy tie, burden, obligation, or emotional hook needs to be cut or cleaned up",
+    reversed: "a painful tie is hard to sever, leaving attachment, residue, or unfinished separation"
+  },
+  skill_12: {
+    upright: "change is natural; the best response is to move with the rise and fall rather than control it",
+    reversed: "trying to control change may create more instability, frustration, or emotional stuckness"
+  },
+  skill_13: {
+    upright: "active offering or contribution can create the next step and bring a meaningful return",
+    reversed: "pushing for progress through more sacrifice may be premature, unequal, or ineffective"
+  },
+  skill_14: {
+    upright: "chaos disrupts the plan, but the disorder may create room to improvise or find new openings",
+    reversed: "the disorder is less playful and more costly; the plan may need cleanup and reconstruction"
+  },
+  skill_15: {
+    upright: "resources, effort, or attention need to be balanced, shared, or fairly redistributed",
+    reversed: "imbalance, deprivation, unfair sharing, or wanting more than the situation can give needs attention"
+  },
+  skill_16: {
+    upright: "the current result or direction may reverse, so what seems fixed may turn into its opposite",
+    reversed: "an expected reversal may not form, or the imagined cause-and-effect may not work as assumed"
+  },
+  action_01: {
+    upright: "something is being forcefully excluded, targeted, cut out, or treated as unacceptable",
+    reversed: "the urge to exclude may come from fear, avoidance, or misidentifying the real problem"
+  },
+  action_02: {
+    upright: "direct conflict or decisive action is difficult to avoid and needs to be faced strategically",
+    reversed: "a conflict may become prolonged, costly, or hard to end; the aftermath also needs planning"
+  },
+  action_03: {
+    upright: "group pressure or shared sacrifice may pull people into loss under the name of devotion",
+    reversed: "there is a chance to notice exploitation, stop being used, and reclaim the choice to give or not give"
+  },
+  action_04: {
+    upright: "outside voices, gossip, rumors, or other people's opinions are already affecting the situation",
+    reversed: "hidden talk, unspoken influence, or unclear background voices may be shaping the situation quietly"
+  },
+  action_05: {
+    upright: "ongoing debate, argument, negotiation, or repeated exchange of opinions consumes energy",
+    reversed: "communication may stop, talks may fail, or one side may refuse to keep discussing"
+  },
+  action_06: {
+    upright: "planning, arrangement, timing, and seeing the larger pattern are important now",
+    reversed: "the arrangement may be miscalculated, too clever, disrupted, or unable to match the larger situation"
+  },
+  action_07: {
+    upright: "mercy, patience, forgiveness, or giving someone a step down may help, as long as boundaries remain",
+    reversed: "forced forgiveness or self-sacrificing tolerance may hide resentment, imbalance, or being taken for granted"
+  },
+  action_08: {
+    upright: "hold a considered belief steady and do not let random noise shake the decision too easily",
+    reversed: "the decision may not be fully thought through, so other perspectives should be heard before insisting"
+  },
+  action_09: {
+    upright: "a visible betrayal, break, departure, third-party issue, or hard rupture may be involved",
+    reversed: "the rupture may not be fully exposed or fully ended; cracks, third-party risk, or leftover ties remain"
+  },
+  action_10: {
+    upright: "support, agreement, or trust needs to be earned through persuasion, patience, and steady presence",
+    reversed: "support may be hard to gain, or over-persuasion may make others resist instead of trust"
+  },
+  action_11: {
+    upright: "gather more information, observe widely, verify facts, and understand the broader situation",
+    reversed: "information may be noisy, unreliable, excessive, or hard to organize into a clear judgment"
+  },
+  action_12: {
+    upright: "an alliance, agreement, promise, or mutual understanding can form and hold for now",
+    reversed: "a promise may fail, an alliance may wobble, or something assumed secret may not remain hidden"
+  },
+  action_13: {
+    upright: "a blocked situation may still find a turning point, so do not give up too early",
+    reversed: "the timing is not open yet, so expecting an immediate miracle or sudden change may disappoint"
+  },
+  action_14: {
+    upright: "goodwill, blessings, helpful people, reputation, or accumulated kindness may support the situation",
+    reversed: "goodwill or fortune may be insufficient right now, so more kindness, repair, or contribution may be needed"
+  },
+  action_15: {
+    upright: "guidance, inspiration, inner wisdom, or a higher signal may offer the missing answer or resource",
+    reversed: "the signal is noisy, mixed with projection, or not ready to be answered clearly yet"
+  }
+};
+
+function orientationKey(item) {
+  return item.orientation === "逆位" ? "reversed" : "upright";
+}
+
+function englishRoleForItem(item) {
+  const seed = englishMeaningSeeds[item.card.id]?.[orientationKey(item)];
+  if (seed) return seed;
+  const phrase = conclusionPhrase(item);
+  const matched = conclusionRewriteRulesEn.find(([pattern]) => pattern.test(phrase));
+  if (matched) return matched[1];
+  return `${cardDisplayName(item.card)} in ${uiText.en.orientations[item.orientation] || item.orientation} position`;
+}
+
 function conclusionIdea(item, fallbackPrefix) {
   const phrase = conclusionPhrase(item);
-  const rules = currentLanguage === "en" ? conclusionRewriteRulesEn : conclusionRewriteRules;
-  const matched = rules.find(([pattern]) => pattern.test(phrase));
+  if (currentLanguage === "en") {
+    const matched = conclusionRewriteRulesEn.find(([pattern]) => pattern.test(phrase));
+    return matched ? matched[1] : `${fallbackPrefix}${englishRoleForItem(item)}`;
+  }
+  const matched = conclusionRewriteRules.find(([pattern]) => pattern.test(phrase));
   if (matched) return matched[1];
-  if (currentLanguage === "en") return `${fallbackPrefix}${cardDisplayName(item.card)} (${uiText.en.orientations[item.orientation]})`;
   return phrase;
 }
 function contextSeed(item, type) {
@@ -1215,11 +1365,12 @@ function buildSummary(question, type, spreadKey, draws) {
   if (spreadKey !== "three") {
     return `${subject}，${displaySeedForPosition(dominant)}`;
   }
-  const main = conclusionIdea(dominant, currentLanguage === "en" ? "represented by " : "目前的核心傾向是：");
-  const influence = interference ? conclusionIdea(interference, currentLanguage === "en" ? "shaped by " : "容易卡在：") : (currentLanguage === "en" ? "the influencing factor is not obvious" : "影響因素目前不明顯");
-  const advice = exit ? conclusionIdea(exit, currentLanguage === "en" ? "start from " : "先從這裡切入：") : (currentLanguage === "en" ? "the suggested direction is not obvious" : "建議方向目前不明顯");
+
+  const main = conclusionIdea(dominant, currentLanguage === "en" ? "" : "目前的核心傾向是：");
+  const influence = interference ? conclusionIdea(interference, currentLanguage === "en" ? "" : "容易卡在：") : (currentLanguage === "en" ? "the influencing factor is not obvious" : "影響因素目前不明顯");
+  const advice = exit ? conclusionIdea(exit, currentLanguage === "en" ? "" : "先從這裡切入：") : (currentLanguage === "en" ? "the suggested direction is not obvious" : "建議方向目前不明顯");
   return currentLanguage === "en"
-    ? `${subject}, the point is not only the surface result: ${main}. However, ${influence}; if this remains unresolved, the situation can stay stuck. Rather than repeating the same approach, it is better to ${advice}.`
+    ? `${subject}, the main tendency is this: ${main}. The complicating factor is this: ${influence}. The suggested direction is this: ${advice}.`
     : `${subject}，這題的重點不是只看表面結果，而是${main}。不過，${influence}；如果這一段不處理，局勢很容易卡住。接下來比起重複原本做法，更適合${advice}。`;
 }
 function buildAiPrompt(question, type, spreadKey, draws, summary, mode = "compact") {
@@ -1232,7 +1383,7 @@ function buildAiPrompt(question, type, spreadKey, draws, summary, mode = "compac
         `Type: ${uiText.en.categories[item.card.category]} ${item.card.number}`,
         `Orientation: ${uiText.en.orientations[item.orientation]}`,
         `Follower strength: ${item.believer.english} ${item.weight} (${uiText.en.weights[item.weight]})`,
-        `Plain role: ${conclusionIdea(item, "represented by ")}`
+        `Plain role: ${conclusionIdea(item, "")}`
       ].join("\n");
     }
     const seed = getSeed(item);
@@ -1262,7 +1413,7 @@ function buildAiPrompt(question, type, spreadKey, draws, summary, mode = "compac
 }
 function renderReading(question, type, spreadKey, draws) {
   if (idlePanel) idlePanel.hidden = true;
-  if (actionRow) actionRow.hidden = true;
+  setSubmitVisible(false);
   const summary = buildSummary(question, type, spreadKey, draws);
   latestAiPrompt = buildAiPrompt(question, type, spreadKey, draws, summary, "compact");
   latestFullAiPrompt = buildAiPrompt(question, type, spreadKey, draws, summary, "full");
@@ -1293,6 +1444,9 @@ function renderReading(question, type, spreadKey, draws) {
 
 function renderCard(item, type) {
   const category = uiText[currentLanguage].categories[item.card.category] || item.card.category;
+  const englishRole = currentLanguage === "en"
+    ? `<div class="card-role"><p class="section-label">Role</p><p class="meaning">${escapeHtml(englishRoleForItem(item))}</p></div>`
+    : "";
   return `
     <article class="card-frame compact-card">
       <div class="card-top">
@@ -1306,6 +1460,7 @@ function renderCard(item, type) {
           <span class="badge">${category} ${item.card.number}</span>
           <span class="badge weight-${item.weight}">${escapeHtml(believerDisplayName(item.believer))} ${item.weight} · ${uiText[currentLanguage].weights[item.weight]}</span>
         </div>
+        ${englishRole}
       </div>
     </article>
   `;
@@ -1400,7 +1555,7 @@ languageButtons.forEach((button) => {
     currentLanguage = button.dataset.language || "zh";
     resultArea.innerHTML = "";
     if (idlePanel) idlePanel.hidden = false;
-    if (actionRow) actionRow.hidden = false;
+    setSubmitVisible(true);
     applyLanguage();
   });
 });
@@ -1522,7 +1677,7 @@ form.addEventListener("submit", (event) => {
     const draws = readingMode === "manual" ? buildManualReading() : drawReading(spreadKey);
     renderReading(question, type, spreadKey, draws);
   } catch (error) {
-    if (actionRow) actionRow.hidden = false;
+    setSubmitVisible(true);
     resultArea.innerHTML = `
       <div class="empty-state">
         <div class="empty-card">!</div>
@@ -1541,5 +1696,5 @@ function resetReading() {
   latestFullAiPrompt = "";
   resultArea.innerHTML = "";
   if (idlePanel) idlePanel.hidden = false;
-  if (actionRow) actionRow.hidden = false;
+  setSubmitVisible(true);
 }
