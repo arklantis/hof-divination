@@ -73,6 +73,30 @@ h1 {
   letter-spacing: 0;
 }
 
+
+.language-switch {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: -8px 0 18px;
+}
+
+.language-button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  background: #fffdf8;
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.language-button.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
 .control-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -381,7 +405,31 @@ button:active {
   .reading-panel {
     padding: 18px;
   }
-  .control-grid {
+  
+.language-switch {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: -8px 0 18px;
+}
+
+.language-button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  background: #fffdf8;
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.language-button.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+.control-grid {
     grid-template-columns: 1fr;
   }
   .action-row {

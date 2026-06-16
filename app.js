@@ -894,10 +894,101 @@ const weightText = {
   5: "極強"
 };
 
+const uiText = {
+  zh: {
+    questionTypeLabel: "問題類型",
+    customTopicLabel: "自訂議題",
+    questionLabel: "你的問題",
+    customTopicPlaceholder: "自行填寫你的議題",
+    questionPlaceholder: "例如：這段關係接下來該怎麼看？",
+    presetButton: "產生常見問題",
+    spreadLabel: "牌陣",
+    spreadText: "固定三張：局勢主軸 / 影響因素 / 建議方向",
+    drawMethodLabel: "抽牌方式",
+    autoDraw: "網站抽牌",
+    manualInput: "實體牌輸入",
+    idleText: "先選議題，再輸入問題；也可以切到實體牌輸入模式用下拉選單選牌。",
+    manualTitle: "實體牌輸入",
+    manualDescription: "選擇你自己抽到的三張主牌與各自的信徒強度，網站會依強度推定局勢主軸、影響因素、建議方向。",
+    drawButton: "抽牌",
+    manualSubmit: "解讀實體牌",
+    yourQuestion: "你的問題",
+    drawnCards: "抽到的牌",
+    conclusion: "白話結論",
+    copyPrompt: "複製精簡 Prompt",
+    reset: "重新算牌",
+    copied: "已複製",
+    copyFailed: "複製失敗，請允許剪貼簿權限",
+    cardMeaning: "牌義",
+    notEntered: "未輸入具體問題",
+    errorMessage: "輸入資料有誤，請重新確認。",
+    positions: { "局勢主軸": "局勢主軸", "影響因素": "影響因素", "建議方向": "建議方向", "核心訊息": "核心訊息" },
+    orientations: { "正位": "正位", "逆位": "逆位" },
+    categories: { skill: "技能牌", action: "行動牌" },
+    weights: weightText,
+    typeLabels
+  },
+  en: {
+    questionTypeLabel: "Topic",
+    customTopicLabel: "Custom Topic",
+    questionLabel: "Question",
+    customTopicPlaceholder: "Enter your topic",
+    questionPlaceholder: "Example: What should I understand about this relationship?",
+    presetButton: "Generate Question",
+    spreadLabel: "Spread",
+    spreadText: "Fixed three cards: Situation Core / Influencing Factor / Suggested Direction",
+    drawMethodLabel: "Draw Method",
+    autoDraw: "Website Draw",
+    manualInput: "Physical Card Input",
+    idleText: "Choose a topic, enter a question, or switch to physical card input.",
+    manualTitle: "Physical Card Input",
+    manualDescription: "Select your three main cards and their follower strength. The site will infer the three positions by strength.",
+    drawButton: "Draw Cards",
+    manualSubmit: "Read Physical Cards",
+    yourQuestion: "Your Question",
+    drawnCards: "Drawn Cards",
+    conclusion: "Plain Conclusion",
+    copyPrompt: "Copy Compact Prompt",
+    reset: "New Reading",
+    copied: "Copied",
+    copyFailed: "Copy failed. Please allow clipboard access.",
+    cardMeaning: "Meaning",
+    notEntered: "No specific question entered",
+    errorMessage: "Input error. Please check again.",
+    positions: { "局勢主軸": "Situation Core", "影響因素": "Influencing Factor", "建議方向": "Suggested Direction", "核心訊息": "Core Message" },
+    orientations: { "正位": "Upright", "逆位": "Reversed" },
+    categories: { skill: "Skill Card", action: "Action Card" },
+    weights: { 1: "faint", 2: "light", 3: "clear", 4: "strong", 5: "dominant" },
+    typeLabels: { general: "General", love: "Relationship", work: "Career", decision: "Decision", money: "Money & Resources", self: "Self", custom: "Custom Topic" }
+  }
+};
+
+function textFor(key) {
+  return uiText[currentLanguage][key] || uiText.zh[key] || key;
+}
+
+function localizedTypeLabel(type) {
+  if (type === "custom") {
+    const topic = customTopicInput?.value.trim();
+    const base = uiText[currentLanguage].typeLabels.custom;
+    return topic ? `${base}: ${topic}` : base;
+  }
+  return uiText[currentLanguage].typeLabels[type] || uiText[currentLanguage].typeLabels.general;
+}
+
+function cardDisplayName(card) {
+  return currentLanguage === "en" ? card.english : card.chinese;
+}
+
+function believerDisplayName(card) {
+  return currentLanguage === "en" ? card.english : card.chinese;
+}
+
 const form = document.querySelector("#reading-form");
 const questionInput = document.querySelector("#question-input");
 const questionTypeGroup = document.querySelector("#question-type");
 const topicButtons = document.querySelectorAll(".topic-button");
+const languageButtons = document.querySelectorAll(".language-button");
 
 const resultArea = document.querySelector("#result-area");
 const submitButton = document.querySelector("#submit-button");
@@ -913,6 +1004,7 @@ const customTopicField = document.querySelector("#custom-topic-field");
 const customTopicInput = document.querySelector("#custom-topic-input");
 let readingMode = "auto";
 let currentQuestionType = "general";
+let currentLanguage = "zh";
 let latestAiPrompt = "";
 let latestFullAiPrompt = "";
 
@@ -1056,12 +1148,35 @@ const conclusionRewriteRules = [
   [/結果翻轉|現況走向反面|反轉力量|翻面|不照原本方向走/, "現在看到的方向未必會照原樣走下去，局勢有翻面的可能"],
   [/反轉失效|翻盤未成形/, "不要把希望放在預期中的翻盤上，局勢未必會照想像反轉"]
 ];
+const conclusionRewriteRulesEn = [
+  [/復原可能|未必真的死透/, "there is still room for recovery, repair, or reopening"],
+  [/某些牽連已經消耗判斷|不處理就很難往前/, "the situation is being held back by unresolved ties and emotional drain"],
+  [/回到本心|真正要什麼/, "clarify what you truly want to keep, repair, or release"],
+  [/善意支撐不足|不容易自動往好處走/, "this is unlikely to improve by goodwill, luck, or passive waiting alone"],
+  [/人心被影響|未必只聽自己的感受/, "outside voices are affecting judgment, so this is not only about private feelings"],
+  [/帶著界線包容|讓對方有台階/, "use compassion with boundaries, without turning patience into self-drain"],
+  [/說服受阻|人心還沒有過來/, "hearts and minds have not moved yet, so communication or persuasion may feel blocked"],
+  [/付出很多卻沒有真正推進/, "more effort will not necessarily create progress unless the direction is corrected"],
+  [/信念開始鬆動|原本相信的東西需要檢查/, "an old belief or long-held assumption needs to be tested again"],
+  [/局勢混亂但有操作空間|打亂原計畫/, "the situation is disrupted, but the disruption may still create room to maneuver"],
+  [/計畫失靈|安排不一定有效/, "the original plan may not work as expected, so the strategy needs review"],
+  [/留意訊息來源|查清背後敘事/, "check the source of information and the story behind it before accepting it"],
+  [/外援不足|足夠資源/, "available support and accumulated resources are not enough to rely on outside help"],
+  [/衝突當成必須處理|選擇戰略/, "treat the conflict as a real issue and choose a strategy instead of reacting blindly"],
+  [/切斷與清理|明確界線/, "boundaries, responsibilities, or unhealthy ties need to be cleaned up"],
+  [/直覺|預判|趨勢感/, "trust the intuition or judgment that remains steady after observation"],
+  [/前途不明|關鍵資訊尚未浮現/, "important information is still missing, so the outcome should not be fixed too early"],
+  [/結果翻轉|現況走向反面|反轉力量|翻面|不照原本方向走/, "the current direction may flip, so the visible situation may not continue as it is"],
+  [/反轉失效|翻盤未成形/, "do not rely on an expected turnaround; the situation may not reverse as hoped"]
+];
 
 function conclusionIdea(item, fallbackPrefix) {
   const phrase = conclusionPhrase(item);
-  const matched = conclusionRewriteRules.find(([pattern]) => pattern.test(phrase));
+  const rules = currentLanguage === "en" ? conclusionRewriteRulesEn : conclusionRewriteRules;
+  const matched = rules.find(([pattern]) => pattern.test(phrase));
   if (matched) return matched[1];
-  return `${fallbackPrefix}${phrase}`;
+  if (currentLanguage === "en") return `${fallbackPrefix}${cardDisplayName(item.card)} (${uiText.en.orientations[item.orientation]})`;
+  return phrase;
 }
 function contextSeed(item, type) {
   const seed = getSeed(item);
@@ -1070,11 +1185,7 @@ function contextSeed(item, type) {
 }
 
 function effectiveTypeLabel(type) {
-  if (type === "custom") {
-    const topic = customTopicInput?.value.trim();
-    return topic ? `自訂議題：${topic}` : "自訂議題";
-  }
-  return typeLabels[type] || typeLabels.general;
+  return localizedTypeLabel(type);
 }
 
 function effectiveTypePrompt(type) {
@@ -1090,31 +1201,46 @@ function buildSummary(question, type, spreadKey, draws) {
   const dominant = draws.find((item) => item.spreadPosition === "局勢主軸") || draws[0];
   const interference = draws.find((item) => item.spreadPosition === "影響因素");
   const exit = draws.find((item) => item.spreadPosition === "建議方向");
-  const subject = question ? `以「${question}」來看` : `以「${effectiveTypeLabel(type)}」來看`;
+  const subject = question
+    ? (currentLanguage === "en" ? `For "${question}"` : `以「${question}」來看`)
+    : (currentLanguage === "en" ? `For "${effectiveTypeLabel(type)}"` : `以「${effectiveTypeLabel(type)}」來看`);
 
   if (allWeak) {
-    return `${subject}，目前訊號還很輕，事情比較像剛出現苗頭，還不適合急著下重判斷。可以先觀察主軸、影響與建議三個方向，等哪個跡象變明顯，再決定下一步。`;
+    return currentLanguage === "en"
+      ? `${subject}, the signal is still light. This looks more like an early sign than a formed conclusion. Observe the core, influence, and suggested direction first, then decide when one sign becomes stronger.`
+      : `${subject}，目前訊號還很輕，事情比較像剛出現苗頭，還不適合急著下重判斷。可以先觀察主軸、影響與建議三個方向，等哪個跡象變明顯，再決定下一步。`;
   }
 
   if (spreadKey !== "three") {
     return `${subject}，${displaySeedForPosition(dominant)}`;
   }
-  const main = conclusionIdea(dominant, "目前的核心傾向是：");
-  const influence = interference ? conclusionIdea(interference, "容易卡在：") : "影響因素目前不明顯";
-  const advice = exit ? conclusionIdea(exit, "先從這裡切入：") : "建議方向目前不明顯";
-  return `${subject}，這題的重點不是只看表面結果，而是${main}。不過，${influence}；如果這一段不處理，局勢很容易卡住。接下來比起重複原本做法，更適合${advice}。`;
+  const main = conclusionIdea(dominant, currentLanguage === "en" ? "represented by " : "目前的核心傾向是：");
+  const influence = interference ? conclusionIdea(interference, currentLanguage === "en" ? "shaped by " : "容易卡在：") : (currentLanguage === "en" ? "the influencing factor is not obvious" : "影響因素目前不明顯");
+  const advice = exit ? conclusionIdea(exit, currentLanguage === "en" ? "start from " : "先從這裡切入：") : (currentLanguage === "en" ? "the suggested direction is not obvious" : "建議方向目前不明顯");
+  return currentLanguage === "en"
+    ? `${subject}, the point is not only the surface result: ${main}. However, ${influence}; if this remains unresolved, the situation can stay stuck. Rather than repeating the same approach, it is better to ${advice}.`
+    : `${subject}，這題的重點不是只看表面結果，而是${main}。不過，${influence}；如果這一段不處理，局勢很容易卡住。接下來比起重複原本做法，更適合${advice}。`;
 }
 function buildAiPrompt(question, type, spreadKey, draws, summary, mode = "compact") {
-  const inferenceNote = draws.find((item) => item.inferenceNote)?.inferenceNote || "";
   const includeFull = mode === "full";
   const cardBlocks = draws.map((item) => {
+    if (currentLanguage === "en") {
+      return [
+        `## ${uiText.en.positions[item.spreadPosition] || item.spreadPosition}`,
+        `Main card: ${item.card.english}`,
+        `Type: ${uiText.en.categories[item.card.category]} ${item.card.number}`,
+        `Orientation: ${uiText.en.orientations[item.orientation]}`,
+        `Follower strength: ${item.believer.english} ${item.weight} (${uiText.en.weights[item.weight]})`,
+        `Plain role: ${conclusionIdea(item, "represented by ")}`
+      ].join("\n");
+    }
     const seed = getSeed(item);
     return [
       `## ${item.spreadPosition}`,
-      `主牌：${item.card.chinese} / ${item.card.english}`,
+      `主牌：${item.card.chinese}`,
       `類型：${item.card.category === "skill" ? "技能牌" : "行動牌"} ${item.card.number}`,
       `正逆位：${item.orientation}`,
-      `信徒強度：${item.believer.chinese} / ${item.believer.english} ${item.weight}（${weightText[item.weight]}）`,
+      `信徒強度：${item.believer.chinese} ${item.weight}（${weightText[item.weight]}）`,
       `白話角色：${seedForPosition(item)}`,
       type === "love" ? `感情脈絡：${seed.love || contextSeed(item, type)}` : `問題脈絡：${contextSeed(item, type)}`,
       includeFull ? `完整牌義：${item.meaning}` : "",
@@ -1122,6 +1248,11 @@ function buildAiPrompt(question, type, spreadKey, draws, summary, mode = "compac
     ].filter(Boolean).join("\n");
   }).join("\n\n");
 
+  if (currentLanguage === "en") {
+    return `You are a "Hegemony of Faith Divination" reading assistant. This is not tarot and not a past/present/future spread. Use only the rules, card roles, and context below; do not invent new card meanings.\n\n## Spread Rules\n- Fixed three-card spread: Situation Core, Influencing Factor, Suggested Direction.\n- Each main card has a follower strength from 1 to 5. Followers may repeat.\n- 1=faint, 2=light, 3=clear, 4=strong, 5=dominant.\n- Positions are inferred by strength: highest = Situation Core, middle = Influencing Factor, lowest = Suggested Direction. Ties should be read together instead of forced into certainty.\n- Use careful language: tendency, reminder, suggestion, needs evaluation. Do not turn possibility into fact.\n- The suggested direction is not an absolute command.\n\n## Question\nTopic: ${effectiveTypeLabel(type)}\nQuestion: ${question || "No specific question entered"}\n\n## Site Initial Reading\n${summary}\n\n## Drawn Cards\n${cardBlocks}\n\nPlease output:\n1. Plain conclusion\n2. How the three cards modify each other\n3. Reminder for the querent\n4. If this spread is not suitable for a definite yes/no answer, explain why.`;
+  }
+
+  const inferenceNote = draws.find((item) => item.inferenceNote)?.inferenceNote || "";
   const ruleDetail = includeFull
     ? "請只根據以下規則與牌義解讀，不要自行發明新牌義。"
     : "請只根據以下規則、白話角色與情境脈絡解讀；不要自行發明新牌義。";
@@ -1136,52 +1267,43 @@ function renderReading(question, type, spreadKey, draws) {
   latestFullAiPrompt = buildAiPrompt(question, type, spreadKey, draws, summary, "full");
   resultArea.innerHTML = `
     <section class="question-summary">
-      <p class="section-label">你的問題</p>
-      <p class="question-line">${escapeHtml(question || "未輸入具體問題")}</p>
+      <p class="section-label">${textFor("yourQuestion")}</p>
+      <p class="question-line">${escapeHtml(question || textFor("notEntered"))}</p>
       <p class="topic-line">${escapeHtml(effectiveTypeLabel(type))}</p>
     </section>
     <section class="drawn-cards" aria-label="抽出的牌">
-      <h2>抽到的牌</h2>
+      <h2>${textFor("drawnCards")}</h2>
       <div class="cards-grid">
         ${draws.map((item) => renderCard(item, type)).join("")}
       </div>
     </section>
     <section class="reading-summary">
-      <h2>白話結論</h2>
+      <h2>${textFor("conclusion")}</h2>
       <p class="summary-text">${escapeHtml(summary)}</p>
     </section>
     <section class="prompt-copy-panel" aria-label="AI prompt 複製">
-      <button class="secondary-button copy-prompt-button" data-prompt-kind="compact" type="button">複製精簡 Prompt</button>
+      <button class="secondary-button copy-prompt-button" data-prompt-kind="compact" type="button">${textFor("copyPrompt")}</button>
       <button class="secondary-button copy-prompt-button hidden-copy" data-prompt-kind="full" type="button" hidden>複製完整 Prompt</button>
-      <button class="secondary-button" id="reset-button" type="button">重新算牌</button>
+      <button class="secondary-button" id="reset-button" type="button">${textFor("reset")}</button>
       <span class="copy-status" id="copy-status" aria-live="polite"></span>
     </section>
   `;
 }
 
 function renderCard(item, type) {
-  const category = item.card.category === "skill" ? "技能牌" : "行動牌";
+  const category = uiText[currentLanguage].categories[item.card.category] || item.card.category;
   return `
-    <article class="card-frame">
+    <article class="card-frame compact-card">
       <div class="card-top">
-        <span class="position-tag">${escapeHtml(item.spreadPosition)} · ${escapeHtml(item.orientation)}</span>
+        <span class="position-tag">${escapeHtml(uiText[currentLanguage].positions[item.spreadPosition] || item.spreadPosition)} · ${escapeHtml(uiText[currentLanguage].orientations[item.orientation] || item.orientation)}</span>
         <div class="card-name">
-          <h3>${escapeHtml(item.card.chinese)}</h3>
-          <p>${escapeHtml(item.card.english)}</p>
+          <h3>${escapeHtml(cardDisplayName(item.card))}</h3>
         </div>
       </div>
       <div class="card-body">
         <div class="meta-row">
           <span class="badge">${category} ${item.card.number}</span>
-          <span class="badge weight-${item.weight}">${escapeHtml(item.believer.chinese)} ${item.weight} · ${weightText[item.weight]}</span>
-        </div>
-        <div>
-          <p class="section-label">白話角色</p>
-          <p class="meaning">${escapeHtml(displaySeedForPosition(item))}</p>
-        </div>
-        <div>
-          <p class="section-label">牌義</p>
-          <p class="meaning">${escapeHtml(firstSentences(item.meaning, 3))}</p>
+          <span class="badge weight-${item.weight}">${escapeHtml(believerDisplayName(item.believer))} ${item.weight} · ${uiText[currentLanguage].weights[item.weight]}</span>
         </div>
       </div>
     </article>
@@ -1234,26 +1356,70 @@ resultArea.addEventListener("click", async (event) => {
   try {
     const prompt = event.target.dataset.promptKind === "full" ? latestFullAiPrompt : latestAiPrompt;
     await copyText(prompt);
-    setCopyStatus("已複製");
+    setCopyStatus(textFor("copied"));
   } catch (error) {
-    setCopyStatus("複製失敗，請允許剪貼簿權限");
+    setCopyStatus(textFor("copyFailed"));
   }
 });
 
+function applyLanguage() {
+  document.documentElement.lang = currentLanguage === "en" ? "en" : "zh-Hant";
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = textFor(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.setAttribute("placeholder", textFor(element.dataset.i18nPlaceholder));
+  });
+  languageButtons.forEach((button) => {
+    const active = button.dataset.language === currentLanguage;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  topicButtons.forEach((button) => {
+    const type = button.dataset.type || "general";
+    button.textContent = uiText[currentLanguage].typeLabels[type] || type;
+  });
+  document.querySelectorAll(".manual-row").forEach((row, index) => {
+    const labels = row.querySelectorAll("label.field > span");
+    if (labels[0]) labels[0].textContent = currentLanguage === "en" ? `Main Card ${index + 1}` : `主牌 ${index + 1}`;
+    if (labels[1]) labels[1].textContent = currentLanguage === "en" ? "Orientation" : "正逆位";
+    if (labels[2]) labels[2].textContent = currentLanguage === "en" ? "Follower Strength" : "信徒強度";
+  });
+  manualOrientationSelects.forEach((select) => {
+    [...select.options].forEach((option) => {
+      option.textContent = uiText[currentLanguage].orientations[option.value] || option.value;
+    });
+  });
+  populateManualControls();
+  setReadingMode(readingMode);
+}
+
+languageButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    currentLanguage = button.dataset.language || "zh";
+    resultArea.innerHTML = "";
+    if (idlePanel) idlePanel.hidden = false;
+    if (actionRow) actionRow.hidden = false;
+    applyLanguage();
+  });
+});
 function populateManualControls() {
   const cardOptions = mainCards
-    .map((card) => `<option value="${card.id}">${card.category === "skill" ? "技能" : "行動"} ${card.number}. ${card.chinese} / ${card.english}</option>`)
+    .map((card) => `<option value="${card.id}">${uiText[currentLanguage].categories[card.category]} ${card.number}. ${cardDisplayName(card)}</option>`)
     .join("");
   const believerOptions = believerCards
-    .map((card) => `<option value="${card.id}">${card.category === "skill" ? "技能" : "行動"} ${card.number}. ${card.chinese} / ${card.english}</option>`)
+    .map((card) => `<option value="${card.id}">${believerDisplayName(card)} ${card.number} · ${uiText[currentLanguage].weights[card.number]}</option>`)
     .join("");
   manualCardSelects.forEach((select, index) => {
+    const current = select.value;
     select.innerHTML = cardOptions;
-    select.selectedIndex = index;
+    select.value = current || mainCards[index]?.id || mainCards[0]?.id;
+    if (!select.value) select.selectedIndex = index;
   });
   manualBelieverSelects.forEach((select, index) => {
+    const current = select.value;
     select.innerHTML = believerOptions;
-    select.selectedIndex = Math.min(index, believerCards.length - 1);
+    select.value = current || believerCards[Math.min(index, believerCards.length - 1)]?.id || believerCards[0]?.id;
   });
 }
 
@@ -1272,7 +1438,7 @@ function setReadingMode(mode) {
   autoOnlyControls.forEach((element) => {
     element.hidden = manual;
   });
-  submitButton.textContent = manual ? "解讀實體牌" : "抽牌";
+  submitButton.textContent = manual ? textFor("manualSubmit") : textFor("drawButton");
 }
 
 populateManualControls();
@@ -1283,64 +1449,37 @@ modeButtons.forEach((button) => {
 });
 
 const presetQuestions = {
-  general: [
-    "這件事目前真正的重點是什麼？",
-    "接下來一個月最需要注意什麼？",
-    "目前局勢會往哪個方向發展？",
-    "我現在最不該忽略的是什麼？",
-    "這件事還有哪些看不見的影響？"
-  ],
-  love: [
-    "這段關係現在真正的狀態是什麼？",
-    "對方目前對這段關係的態度如何？",
-    "這段關係接下來三個月會怎麼發展？",
-    "我和對方之間最大的卡點是什麼？",
-    "這段關係還有機會靠近嗎？"
-  ],
-  work: [
-    "目前工作或事業最需要注意什麼？",
-    "我近期求職或轉職的發展如何？",
-    "這個工作機會值得繼續投入嗎？",
-    "我在職場上目前最大的阻力是什麼？",
-    "接下來工作上比較適合採取什麼方向？"
-  ],
-  decision: [
-    "面對這個選擇，我應該怎麼評估？",
-    "這個決定目前最大的風險是什麼？",
-    "我該不該繼續推進這件事？",
-    "如果我選擇行動，最需要注意什麼？",
-    "如果我暫時不動，局勢會偏向什麼狀態？"
-  ],
-  money: [
-    "近期金錢狀況最需要注意什麼？",
-    "這筆支出或投資目前適合嗎？",
-    "我該如何看待目前的資源壓力？",
-    "接下來財務上最大的風險是什麼？",
-    "我現在應該保守一點還是主動爭取資源？"
-  ],
-  self: [
-    "我現在內在最核心的課題是什麼？",
-    "我目前最需要調整的心態是什麼？",
-    "我現在卡住的真正原因是什麼？",
-    "我現在最需要看清自己的哪一面？",
-    "我該如何重新整理目前的狀態？"
-  ],
-  custom: [
-    "這個狀況接下來需要注意什麼？",
-    "這件事目前真正的問題在哪裡？",
-    "這件事可以怎麼處理比較好？",
-    "這件事有哪些我還沒看清楚的地方？",
-    "接下來我比較適合怎麼面對這件事？"
-  ]
+  zh: {
+    general: ["這件事目前真正的重點是什麼？", "接下來一個月最需要注意什麼？", "目前局勢會往哪個方向發展？", "我現在最不該忽略的是什麼？", "這件事還有哪些看不見的影響？"],
+    love: ["這段關係現在真正的狀態是什麼？", "對方目前對這段關係的態度如何？", "這段關係接下來三個月會怎麼發展？", "我和對方之間最大的卡點是什麼？", "這段關係還有機會靠近嗎？"],
+    work: ["目前工作或事業最需要注意什麼？", "我近期求職或轉職的發展如何？", "這個工作機會值得繼續投入嗎？", "我在職場上目前最大的阻力是什麼？", "接下來工作上比較適合採取什麼方向？"],
+    decision: ["面對這個選擇，我應該怎麼評估？", "這個決定目前最大的風險是什麼？", "我該不該繼續推進這件事？", "如果我選擇行動，最需要注意什麼？", "如果我暫時不動，局勢會偏向什麼狀態？"],
+    money: ["近期金錢狀況最需要注意什麼？", "這筆支出或投資目前適合嗎？", "我該如何看待目前的資源壓力？", "接下來財務上最大的風險是什麼？", "我現在應該保守一點還是主動爭取資源？"],
+    self: ["我現在內在最核心的課題是什麼？", "我目前最需要調整的心態是什麼？", "我現在卡住的真正原因是什麼？", "我現在最需要看清自己的哪一面？", "我該如何重新整理目前的狀態？"],
+    custom: ["這個狀況接下來需要注意什麼？", "這件事目前真正的問題在哪裡？", "這件事可以怎麼處理比較好？", "這件事有哪些我還沒看清楚的地方？", "接下來我比較適合怎麼面對這件事？"]
+  },
+  en: {
+    general: ["What is the real focus of this situation?", "What should I pay attention to in the next month?", "Where is this situation heading?", "What should I not ignore right now?", "What unseen influence is shaping this situation?"],
+    love: ["What is the real state of this relationship?", "How does the other person currently view this relationship?", "How may this relationship develop over the next three months?", "What is the main blockage between us?", "Is there still room for this relationship to move closer?"],
+    work: ["What should I pay attention to in work or career right now?", "How may my job search or career change develop?", "Is this work opportunity worth continuing?", "What is my biggest career obstacle right now?", "What direction is better for work next?"],
+    decision: ["How should I evaluate this choice?", "What is the biggest risk in this decision?", "Should I continue pushing this forward?", "If I take action, what should I watch for?", "If I pause for now, where may the situation go?"],
+    money: ["What should I pay attention to financially?", "Is this expense or investment suitable right now?", "How should I view my current resource pressure?", "What is the biggest financial risk ahead?", "Should I stay conservative or actively seek resources?"],
+    self: ["What is my core inner issue right now?", "What mindset should I adjust now?", "What is the real reason I feel stuck?", "What part of myself do I need to see clearly?", "How should I reorganize my current state?"],
+    custom: ["What should I pay attention to in this situation?", "What is the real issue here?", "How can this be handled better?", "What have I not seen clearly yet?", "How should I face this next?" ]
+  }
 };
 
-const presetQuestionIndex = Object.fromEntries(Object.keys(presetQuestions).map((type) => [type, 0]));
+const presetQuestionIndex = {
+  zh: Object.fromEntries(Object.keys(presetQuestions.zh).map((type) => [type, 0])),
+  en: Object.fromEntries(Object.keys(presetQuestions.en).map((type) => [type, 0]))
+};
 
 function pickPresetQuestion(type) {
-  const key = presetQuestions[type] ? type : "general";
-  const list = presetQuestions[key];
-  const index = presetQuestionIndex[key] % list.length;
-  presetQuestionIndex[key] = (index + 1) % list.length;
+  const bank = presetQuestions[currentLanguage] || presetQuestions.zh;
+  const key = bank[type] ? type : "general";
+  const list = bank[key];
+  const index = presetQuestionIndex[currentLanguage][key] % list.length;
+  presetQuestionIndex[currentLanguage][key] = (index + 1) % list.length;
   return list[index];
 }
 function setQuestionType(type, topic = "") {
@@ -1386,7 +1525,7 @@ form.addEventListener("submit", (event) => {
     resultArea.innerHTML = `
       <div class="empty-state">
         <div class="empty-card">!</div>
-        <p>${escapeHtml(error.message || "輸入資料有誤，請重新確認。")}</p>
+        <p>${escapeHtml(error.message || textFor("errorMessage"))}</p>
       </div>
     `;
   }

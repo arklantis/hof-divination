@@ -14,9 +14,14 @@
         <h1 id="app-title">信仰霸權占卜</h1>
       </div>
 
+      <div class="language-switch" role="group" aria-label="Language">
+        <button type="button" class="language-button active" data-language="zh">中文</button>
+        <button type="button" class="language-button" data-language="en">English</button>
+      </div>
+
       <form id="reading-form" class="control-grid">
         <div class="field full">
-          <span>問題類型</span>
+          <span data-i18n="questionTypeLabel">問題類型</span>
           <div class="topic-row" id="question-type" role="radiogroup" aria-label="問題類型">
             <button type="button" class="topic-button active" data-type="general" aria-pressed="true">整體狀況</button>
             <button type="button" class="topic-button" data-type="love" aria-pressed="false">感情關係</button>
@@ -29,40 +34,40 @@
         </div>
 
         <label class="field full" id="custom-topic-field" hidden>
-          <span>自訂議題</span>
-          <input id="custom-topic-input" type="text" placeholder="自行填寫你的議題">
+          <span data-i18n="customTopicLabel">自訂議題</span>
+          <input id="custom-topic-input" type="text" placeholder="自行填寫你的議題" data-i18n-placeholder="customTopicPlaceholder">
         </label>
 
         <label class="field full">
-          <span>你的問題</span>
-          <textarea id="question-input" rows="3" placeholder="例如：這段關係接下來該怎麼看？"></textarea>
+          <span data-i18n="questionLabel">你的問題</span>
+          <textarea id="question-input" rows="3" placeholder="例如：這段關係接下來該怎麼看？" data-i18n-placeholder="questionPlaceholder"></textarea>
         </label>
 
         <div class="preset-row full" aria-label="快速問題">
-          <button type="button" class="preset" id="random-question-button">產生常見問題</button>
+          <button type="button" class="preset" id="random-question-button"><span data-i18n="presetButton">產生常見問題</span></button>
         </div>
         <div class="field spread-note full">
-          <span>牌陣</span>
-          <p>固定三張：局勢主軸 / 影響因素 / 建議方向</p>
+          <span data-i18n="spreadLabel">牌陣</span>
+          <p><span data-i18n="spreadText">固定三張：局勢主軸 / 影響因素 / 建議方向</span></p>
         </div>
 
         <div class="field full">
-          <span>抽牌方式</span>
+          <span data-i18n="drawMethodLabel">抽牌方式</span>
           <div class="mode-switch" role="tablist" aria-label="抽牌方式">
-            <button type="button" class="mode-button active" data-mode="auto">網站抽牌</button>
-            <button type="button" class="mode-button" data-mode="manual">實體牌輸入</button>
+            <button type="button" class="mode-button active" data-mode="auto"><span data-i18n="autoDraw">網站抽牌</span></button>
+            <button type="button" class="mode-button" data-mode="manual"><span data-i18n="manualInput">實體牌輸入</span></button>
           </div>
         </div>
 
         <div class="empty-state auto-only full" id="idle-panel">
           <div class="empty-card">?</div>
-          <p>先選議題，再輸入問題；也可以切到實體牌輸入模式用下拉選單選牌。</p>
+          <p data-i18n="idleText">先選議題，再輸入問題；也可以切到實體牌輸入模式用下拉選單選牌。</p>
         </div>
 
         <div class="manual-panel full" id="manual-panel" hidden>
           <div class="manual-head">
-            <h2>實體牌輸入</h2>
-            <p>選擇你自己抽到的三張主牌與各自的信徒強度，網站會依強度推定局勢主軸、影響因素、建議方向。</p>
+            <h2 data-i18n="manualTitle">實體牌輸入</h2>
+            <p data-i18n="manualDescription">選擇你自己抽到的三張主牌與各自的信徒強度，網站會依強度推定局勢主軸、影響因素、建議方向。</p>
           </div>
           <div class="manual-grid" id="manual-grid">
             <div class="manual-row">
