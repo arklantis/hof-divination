@@ -874,7 +874,8 @@ const typeLabels = {
   work: "工作事業",
   decision: "選擇決策",
   money: "金錢資源",
-  self: "自我狀態"
+  self: "自我狀態",
+  custom: "自訂議題"
 };
 
 const typePrompts = {
