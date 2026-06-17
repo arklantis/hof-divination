@@ -1319,6 +1319,18 @@ function englishRoleForItem(item) {
   return `${cardDisplayName(item.card)} in ${uiText.en.orientations[item.orientation] || item.orientation} position`;
 }
 
+function englishContextForItem(item, type) {
+  const seed = getSeed(item);
+  if (type === "love") {
+    return `In relationship context, ${englishRoleForItem(item)}.`;
+  }
+  const typeLabel = uiText.en.typeLabels[type] || "this topic";
+  const contextual = type === "love" ? (seed.love || contextSeed(item, type)) : contextSeed(item, type);
+  const matched = conclusionRewriteRulesEn.find(([pattern]) => pattern.test(contextual || ""));
+  if (matched) return `In ${typeLabel.toLowerCase()}, ${matched[1]}.`;
+  return `In ${typeLabel.toLowerCase()}, ${englishRoleForItem(item)}.`;
+}
+
 function conclusionIdea(item, fallbackPrefix) {
   const phrase = conclusionPhrase(item);
   if (currentLanguage === "en") {
@@ -1444,9 +1456,24 @@ function renderReading(question, type, spreadKey, draws) {
 
 function renderCard(item, type) {
   const category = uiText[currentLanguage].categories[item.card.category] || item.card.category;
-  const englishRole = currentLanguage === "en"
-    ? `<div class="card-role"><p class="section-label">Role</p><p class="meaning">${escapeHtml(englishRoleForItem(item))}</p></div>`
-    : "";
+  const seed = getSeed(item);
+  const cardDetail = currentLanguage === "en"
+    ? `<div class="card-role">
+        <p class="section-label">Role</p>
+        <p class="meaning">${escapeHtml(englishRoleForItem(item))}</p>
+      </div>
+      <div class="card-role">
+        <p class="section-label">${type === "love" ? "Relationship Context" : "Context"}</p>
+        <p class="meaning">${escapeHtml(englishContextForItem(item, type))}</p>
+      </div>`
+    : `<div class="card-role">
+        <p class="section-label">白話角色</p>
+        <p class="meaning">${escapeHtml(seedForPosition(item))}</p>
+      </div>
+      <div class="card-role">
+        <p class="section-label">${type === "love" ? "感情脈絡" : "問題脈絡"}</p>
+        <p class="meaning">${escapeHtml(type === "love" ? (seed.love || contextSeed(item, type)) : contextSeed(item, type))}</p>
+      </div>`;
   return `
     <article class="card-frame compact-card">
       <div class="card-top">
@@ -1460,7 +1487,7 @@ function renderCard(item, type) {
           <span class="badge">${category} ${item.card.number}</span>
           <span class="badge weight-${item.weight}">${escapeHtml(believerDisplayName(item.believer))} ${item.weight} · ${uiText[currentLanguage].weights[item.weight]}</span>
         </div>
-        ${englishRole}
+        ${cardDetail}
       </div>
     </article>
   `;
