@@ -1331,6 +1331,12 @@ function englishContextForItem(item, type) {
   return `In ${typeLabel.toLowerCase()}, ${englishRoleForItem(item)}.`;
 }
 
+function englishMeaningSummaryForItem(item) {
+  const role = englishRoleForItem(item);
+  const orientation = uiText.en.orientations[item.orientation] || item.orientation;
+  return `${cardDisplayName(item.card)} ${orientation.toLowerCase()} points to ${role}. Read it as a concrete force in the spread, not only as an abstract mood: it can describe a person, a pattern, an outside condition, or the querent's own way of responding.`;
+}
+
 function conclusionIdea(item, fallbackPrefix) {
   const phrase = conclusionPhrase(item);
   if (currentLanguage === "en") {
@@ -1465,6 +1471,10 @@ function renderCard(item, type) {
       <div class="card-role">
         <p class="section-label">${type === "love" ? "Relationship Context" : "Context"}</p>
         <p class="meaning">${escapeHtml(englishContextForItem(item, type))}</p>
+      </div>
+      <div class="card-role">
+        <p class="section-label">Meaning Summary</p>
+        <p class="meaning">${escapeHtml(englishMeaningSummaryForItem(item))}</p>
       </div>`
     : `<div class="card-role">
         <p class="section-label">白話角色</p>
@@ -1473,6 +1483,10 @@ function renderCard(item, type) {
       <div class="card-role">
         <p class="section-label">${type === "love" ? "感情脈絡" : "問題脈絡"}</p>
         <p class="meaning">${escapeHtml(type === "love" ? (seed.love || contextSeed(item, type)) : contextSeed(item, type))}</p>
+      </div>
+      <div class="card-role">
+        <p class="section-label">牌義摘要</p>
+        <p class="meaning">${escapeHtml(firstSentences(item.meaning, 2))}</p>
       </div>`;
   return `
     <article class="card-frame compact-card">
