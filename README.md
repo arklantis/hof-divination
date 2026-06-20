@@ -27,6 +27,11 @@ The web prototype currently includes working upright/reversed reading text, a th
 
 Open `index.html` directly in a browser to try the current non-AI draw flow. The prototype embeds the current card data in `app.js`, draws Skill/Action cards without repeats, and attaches repeatable Believer strength cards to each main card.
 
+Language-specific entry pages are available for promotion links:
+
+- `zh.html` - opens the Traditional Chinese reading page.
+- `en.html` - opens the English reading page.
+
 ## Optional Statistics
 
 The site can send minimal aggregate events when `stats-config.js` has an `endpoint`:
@@ -36,8 +41,9 @@ The site can send minimal aggregate events when `stats-config.js` has an `endpoi
 - completed readings
 - copied AI prompts
 - selected language, topic, and draw mode
+- 24-hour, today, 7-day, and all-time summary views
 
-The client does not send raw question text, full custom topic text, raw IP, referrer, or user agent. Country/IP-style data should be derived server-side if needed, and raw IP should not be stored. The hidden statistics page is:
+The client does not send raw question text, full custom topic text, raw IP, referrer, or user agent. Country-style reporting uses the browser locale region as a lightweight fallback in the Google Apps Script example. For real visitor country, use a server-side service such as Cloudflare Workers or GA4, and avoid storing raw IP. The hidden statistics page is:
 
 `hof-ledger-ark-2026.html`
 

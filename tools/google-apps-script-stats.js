@@ -14,7 +14,7 @@ function doPost(e) {
     payload.hasCustomTopic ? "1" : "0",
     payload.readingMode || "",
     payload.timezone || "",
-    payload.country || "",
+    payload.country || payload.browserRegion || "",
     JSON.stringify(payload.detail || {})
   ]);
   return json_({ ok: true });
@@ -27,7 +27,7 @@ function doGet(e) {
   if ((e.parameter.mode || "") !== "summary") {
     return json_({ ok: true });
   }
-  return json_(buildSummary_());
+  return json_(buildSummary_(e.parameter.period || "24h"));
 }
 
 function getSheet_() {
@@ -60,27 +60,67 @@ function parsePayload_(e) {
   }
 }
 
-function buildSummary_() {
+function buildSummary_(period) {
   const sheet = getSheet_();
   const values = sheet.getDataRange().getValues();
-  const rows = values.slice(1).map((row) => ({
-    timestamp: row[0],
-    eventName: row[2],
-    sessionId: row[3],
-    language: row[4],
-    questionType: row[5],
-    readingMode: row[7],
-    timezone: row[8],
-    country: row[9] || "unknown"
-  }));
+  const range = resolvePeriod_(period);
+  const rows = values.slice(1)
+    .map((row) => {
+      const detail = parseDetail_(row[10]);
+      return {
+        timestamp: row[0],
+        eventName: row[2],
+        sessionId: row[3],
+        language: row[4],
+        questionType: row[5],
+        readingMode: row[7],
+        timezone: row[8],
+        country: row[9] || "unknown",
+        detail
+      };
+    })
+    .filter((row) => {
+      const time = new Date(row.timestamp).getTime();
+      return !range.since || time >= range.since.getTime();
+    });
+
+  const totals = countBy_(rows, "eventName");
+  totals.reading_with_question = rows.filter((row) => row.eventName === "reading_drawn" && row.detail.hasQuestion).length;
 
   return {
-    totals: countBy_(rows, "eventName"),
+    period,
+    periodLabel: range.label,
+    uniqueSessions: countUnique_(rows, "sessionId"),
+    totals,
     byLanguage: toTable_(countBy_(rows, "language")),
     byTopic: toTable_(countBy_(rows, "questionType")),
     byCountry: toTable_(countBy_(rows, "country")),
     recent: rows.slice(-50).reverse()
   };
+}
+
+function resolvePeriod_(period) {
+  const now = new Date();
+  if (period === "today") {
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
+    return { label: "今日", since: today };
+  }
+  if (period === "7d") {
+    return { label: "最近 7 天", since: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) };
+  }
+  if (period === "all") {
+    return { label: "總體", since: null };
+  }
+  return { label: "最近 24 小時", since: new Date(now.getTime() - 24 * 60 * 60 * 1000) };
+}
+
+function parseDetail_(value) {
+  try {
+    return JSON.parse(value || "{}");
+  } catch (error) {
+    return {};
+  }
 }
 
 function countBy_(rows, key) {
@@ -96,6 +136,10 @@ function toTable_(counts) {
   return Object.keys(counts)
     .sort((a, b) => counts[b] - counts[a])
     .map((key) => ({ key, count: counts[key] }));
+}
+
+function countUnique_(rows, key) {
+  return new Set(rows.map((row) => row[key]).filter(Boolean)).size;
 }
 
 function json_(data) {

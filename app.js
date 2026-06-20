@@ -1005,7 +1005,13 @@ const customTopicField = document.querySelector("#custom-topic-field");
 const customTopicInput = document.querySelector("#custom-topic-input");
 let readingMode = "auto";
 let currentQuestionType = "general";
-let currentLanguage = "zh";
+function initialLanguage() {
+  const params = new URLSearchParams(location.search);
+  const value = (params.get("lang") || "").toLowerCase();
+  return value === "en" ? "en" : "zh";
+}
+
+let currentLanguage = initialLanguage();
 let latestAiPrompt = "";
 let latestFullAiPrompt = "";
 const statsConfig = window.HOF_STATS_CONFIG || {};
@@ -1024,6 +1030,8 @@ function statsEnabled() {
 
 function trackEvent(eventName, detail = {}) {
   if (!statsEnabled()) return;
+  const locale = navigator.language || "";
+  const localeRegion = locale.includes("-") ? locale.split("-").pop().toUpperCase() : "";
   const payload = {
     siteId: statsConfig.siteId || "hof-divination",
     eventName,
@@ -1034,6 +1042,8 @@ function trackEvent(eventName, detail = {}) {
     readingMode,
     path: location.pathname,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    browserLocale: locale,
+    browserRegion: localeRegion,
     timestamp: new Date().toISOString(),
     detail
   };
@@ -1807,4 +1817,5 @@ function resetReading() {
   setSubmitVisible(true);
 }
 
+applyLanguage();
 trackEvent("page_view");
