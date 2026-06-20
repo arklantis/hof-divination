@@ -1008,6 +1008,48 @@ let currentQuestionType = "general";
 let currentLanguage = "zh";
 let latestAiPrompt = "";
 let latestFullAiPrompt = "";
+const statsConfig = window.HOF_STATS_CONFIG || {};
+const statsSessionId = (() => {
+  const key = "hof_stats_session_id";
+  const existing = window.localStorage?.getItem(key);
+  if (existing) return existing;
+  const value = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  window.localStorage?.setItem(key, value);
+  return value;
+})();
+
+function statsEnabled() {
+  return Boolean(statsConfig.endpoint);
+}
+
+function trackEvent(eventName, detail = {}) {
+  if (!statsEnabled()) return;
+  const payload = {
+    siteId: statsConfig.siteId || "hof-divination",
+    eventName,
+    sessionId: statsSessionId,
+    language: currentLanguage,
+    questionType: currentQuestionType,
+    hasCustomTopic: Boolean(customTopicInput?.value.trim()),
+    readingMode,
+    path: location.pathname,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    timestamp: new Date().toISOString(),
+    detail
+  };
+  const body = JSON.stringify(payload);
+  if (navigator.sendBeacon) {
+    const blob = new Blob([body], { type: "text/plain" });
+    navigator.sendBeacon(statsConfig.endpoint, blob);
+    return;
+  }
+  fetch(statsConfig.endpoint, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body
+  }).catch(() => {});
+}
 
 function setSubmitVisible(visible) {
   if (actionRow) actionRow.hidden = !visible;
@@ -1546,6 +1588,7 @@ async function copyText(text) {
 resultArea.addEventListener("click", async (event) => {
   if (!(event.target instanceof HTMLElement)) return;
   if (event.target.id === "reset-button") {
+    trackEvent("reading_reset");
     resetReading();
     return;
   }
@@ -1553,6 +1596,9 @@ resultArea.addEventListener("click", async (event) => {
   try {
     const prompt = event.target.dataset.promptKind === "full" ? latestFullAiPrompt : latestAiPrompt;
     await copyText(prompt);
+    trackEvent("prompt_copied", {
+      promptKind: event.target.dataset.promptKind || "compact"
+    });
     setCopyStatus(textFor("copied"));
   } catch (error) {
     setCopyStatus(textFor("copyFailed"));
@@ -1598,6 +1644,7 @@ languageButtons.forEach((button) => {
     if (idlePanel) idlePanel.hidden = false;
     setSubmitVisible(true);
     applyLanguage();
+    trackEvent("language_changed", { selectedLanguage: currentLanguage });
   });
 });
 function populateManualControls() {
@@ -1642,7 +1689,10 @@ populateManualControls();
 updateCustomTopicVisibility();
 
 modeButtons.forEach((button) => {
-  button.addEventListener("click", () => setReadingMode(button.dataset.mode));
+  button.addEventListener("click", () => {
+    setReadingMode(button.dataset.mode);
+    trackEvent("draw_mode_changed", { mode: readingMode });
+  });
 });
 
 const presetQuestions = {
@@ -1696,12 +1746,20 @@ function setQuestionType(type, topic = "") {
 }
 
 topicButtons.forEach((button) => {
-  button.addEventListener("click", () => setQuestionType(button.dataset.type || "general"));
+  button.addEventListener("click", () => {
+    const type = button.dataset.type || "general";
+    setQuestionType(type);
+    trackEvent("topic_selected", { type });
+  });
 });
 
 function fillRandomQuestion(type = currentQuestionType) {
   questionInput.value = pickPresetQuestion(type);
   questionInput.focus();
+  trackEvent("question_generated", {
+    type,
+    language: currentLanguage
+  });
 }
 
 document.querySelector("#random-question-button")?.addEventListener("click", () => {
@@ -1717,8 +1775,17 @@ form.addEventListener("submit", (event) => {
     const spreadKey = "three";
     const draws = readingMode === "manual" ? buildManualReading() : drawReading(spreadKey);
     renderReading(question, type, spreadKey, draws);
+    trackEvent("reading_drawn", {
+      type,
+      mode: readingMode,
+      hasQuestion: Boolean(question),
+      hasCustomTopic: type === "custom" && Boolean(customTopicInput?.value.trim()),
+      cardCount: draws.length,
+      weights: draws.map((item) => item.weight)
+    });
   } catch (error) {
     setSubmitVisible(true);
+    trackEvent("reading_error");
     resultArea.innerHTML = `
       <div class="empty-state">
         <div class="empty-card">!</div>
@@ -1739,3 +1806,5 @@ function resetReading() {
   if (idlePanel) idlePanel.hidden = false;
   setSubmitVisible(true);
 }
+
+trackEvent("page_view");

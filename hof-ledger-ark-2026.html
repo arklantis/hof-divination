@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>信仰霸權占卜統計</title>
+  <link rel="stylesheet" href="styles.css?v=20260620-stats">
+</head>
+<body>
+  <main class="app-shell stats-shell">
+    <section class="reading-panel">
+      <div class="title-block">
+        <p class="eyebrow">Private Ledger</p>
+        <h1>占卜統計</h1>
+      </div>
+      <div class="control-grid">
+        <label class="field full">
+          <span>管理 Token</span>
+          <input id="stats-token" type="password" placeholder="輸入後端設定的 token">
+        </label>
+        <div class="action-row full">
+          <button class="primary-button" id="load-stats-button" type="button">讀取統計</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="result-area" id="stats-output">
+      <div class="empty-state">
+        <div class="empty-card">#</div>
+        <p>這個頁面不會從主站連出來。資料保護要靠後端 token，不要把 token 分享出去。</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="stats-config.js?v=20260620-stats"></script>
+  <script>
+    const output = document.querySelector("#stats-output");
+    const tokenInput = document.querySelector("#stats-token");
+    const button = document.querySelector("#load-stats-button");
+    const config = window.HOF_STATS_CONFIG || {};
+
+    const params = new URLSearchParams(location.search);
+    tokenInput.value = params.get("token") || window.localStorage.getItem("hof_stats_admin_token") || config.adminToken || "";
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderMetric(label, value) {
+      return `<article class="stat-card"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value || 0)}</strong></article>`;
+    }
+
+    function renderTable(title, rows, columns) {
+      if (!rows || rows.length === 0) {
+        return `<section class="reading-summary"><h2>${escapeHtml(title)}</h2><p class="summary-text">目前沒有資料。</p></section>`;
+      }
+      return `
+        <section class="reading-summary">
+          <h2>${escapeHtml(title)}</h2>
+          <div class="stats-table-wrap">
+            <table class="stats-table">
+              <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
+              <tbody>
+                ${rows.map((row) => `<tr>${columns.map((column) => `<td>${escapeHtml(row[column.key])}</td>`).join("")}</tr>`).join("")}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderStats(data) {
+      const totals = data.totals || {};
+      output.innerHTML = `
+        <section class="stats-grid">
+          ${renderMetric("頁面瀏覽", totals.page_view)}
+          ${renderMetric("產生問題", totals.question_generated)}
+          ${renderMetric("完成抽牌", totals.reading_drawn)}
+          ${renderMetric("複製 AI Prompt", totals.prompt_copied)}
+        </section>
+        ${renderTable("語言", data.byLanguage, [{ key: "key", label: "語言" }, { key: "count", label: "次數" }])}
+        ${renderTable("題型", data.byTopic, [{ key: "key", label: "題型" }, { key: "count", label: "次數" }])}
+        ${renderTable("國家", data.byCountry, [{ key: "key", label: "國家" }, { key: "count", label: "次數" }])}
+        ${renderTable("最近事件", data.recent, [
+          { key: "timestamp", label: "時間" },
+          { key: "eventName", label: "事件" },
+          { key: "language", label: "語言" },
+          { key: "questionType", label: "題型" },
+          { key: "country", label: "國家" }
+        ])}
+      `;
+    }
+
+    async function loadStats() {
+      if (!config.endpoint) {
+        output.innerHTML = `<div class="empty-state"><div class="empty-card">!</div><p>尚未設定 stats-config.js 的 endpoint。</p></div>`;
+        return;
+      }
+      const token = tokenInput.value.trim();
+      window.localStorage.setItem("hof_stats_admin_token", token);
+      output.innerHTML = `<div class="empty-state"><div class="empty-card">...</div><p>讀取中。</p></div>`;
+      const url = `${config.endpoint}?mode=summary&token=${encodeURIComponent(token)}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        renderStats(await response.json());
+      } catch (error) {
+        output.innerHTML = `<div class="empty-state"><div class="empty-card">!</div><p>讀取失敗：${escapeHtml(error.message)}</p></div>`;
+      }
+    }
+
+    button.addEventListener("click", loadStats);
+  </script>
+</body>
+</html>
