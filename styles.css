@@ -695,3 +695,159 @@ button:active {
   justify-content: center;
   flex-wrap: wrap;
 }
+
+
+.hero-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.hero-head .title-block {
+  margin-bottom: 0;
+}
+
+.about-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  border: 1px solid rgba(213, 164, 58, 0.72);
+  border-radius: 6px;
+  background: rgba(255, 247, 223, 0.86);
+  color: var(--accent-dark);
+  padding: 0 14px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.about-link:hover,
+.link-button:hover {
+  filter: brightness(1.04);
+}
+
+.about-shell {
+  display: grid;
+  gap: 22px;
+}
+
+.about-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.about-language {
+  margin: 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.8fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.about-copy {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.about-copy p,
+.about-cta p {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.about-copy .lead-text {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--accent-dark);
+}
+
+.game-photo-card {
+  min-height: 420px;
+  border: 1px solid rgba(213, 164, 58, 0.64);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(90, 8, 5, 0.72), rgba(29, 8, 6, 0.92)),
+    radial-gradient(circle at 50% 25%, rgba(243, 211, 118, 0.32), transparent 42%);
+  box-shadow: inset 0 0 42px rgba(0, 0, 0, 0.34);
+  overflow: hidden;
+}
+
+.game-photo-placeholder {
+  height: 100%;
+  min-height: 420px;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  color: var(--gold-bright);
+  border: 1px dashed rgba(243, 211, 118, 0.58);
+  margin: 16px;
+  border-radius: 8px;
+}
+
+.game-photo-placeholder span {
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.game-photo-placeholder small {
+  color: rgba(255, 247, 223, 0.82);
+  font-weight: 700;
+}
+
+.about-cta h2 {
+  margin: 0 0 10px;
+  color: var(--accent-dark);
+  font-size: 28px;
+}
+
+.about-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.link-button {
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.disabled-link {
+  opacity: 0.58;
+  cursor: default;
+}
+
+@media (max-width: 820px) {
+  .hero-head,
+  .about-topbar {
+    display: grid;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-photo-card,
+  .game-photo-placeholder {
+    min-height: 300px;
+  }
+
+  .about-actions .link-button,
+  .about-link {
+    width: 100%;
+  }
+}

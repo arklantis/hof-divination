@@ -984,6 +984,7 @@ const uiText = {
     conclusion: "Plain Conclusion",
     copyPrompt: "Copy Prompt for AI Reading",
     reset: "New Reading",
+    aboutGameLink: "About the Game",
     copied: "Copied",
     copyFailed: "Copy failed. Please allow clipboard access.",
     cardMeaning: "Meaning",

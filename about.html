@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>???????</title>
+  <link rel="stylesheet" href="styles.css?v=20260629-about">
+</head>
+<body>
+  <main class="app-shell about-shell">
+    <section class="reading-panel about-hero" aria-labelledby="about-title">
+      <div class="about-topbar">
+        <a class="about-link" href="index.html?lang=zh" data-home-link>?????</a>
+        <div class="language-switch about-language" role="group" aria-label="Language">
+          <button type="button" class="language-button active" data-about-language="zh">??</button>
+          <button type="button" class="language-button" data-about-language="en">English</button>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-copy" data-lang-panel="zh">
+          <p class="eyebrow">About Hegemony of Faith</p>
+          <h1 id="about-title">????????</h1>
+          <p class="lead-text">????????? 4-8 ??????????????????????????????????????</p>
+          <p>?????????????????????????????????????????????????????????????????????????????????</p>
+          <p>????????????????????????????????????????????????????????????????????????????????????????????</p>
+          <p>????????????????????????????????????????????????????????????????????????????????</p>
+          <p>??????????????? 36 ?????????????????????????????????????????????????????</p>
+        </div>
+
+        <div class="about-copy" data-lang-panel="en" hidden>
+          <p class="eyebrow">About Hegemony of Faith</p>
+          <h1>What Is Hegemony of Faith?</h1>
+          <p class="lead-text">Hegemony of Faith is a card and party game for 4-8 players. Your main goal is to collect the most believer cards and become the only winner.</p>
+          <p>The central twist is that players do not have to worry about death or elimination. When a player has no believer cards on their turn, they may surrender to another player, swear allegiance, and become a Follower in that player's sect. Of course, that allegiance may not be sincere.</p>
+          <p>Surrender creates temporary cooperation, but also opens the door to betrayal. Followers can secretly rebuild their strength while helping their Leader fight other players, then use skills or action cards to betray the Leader and steal believer cards. Some cards can also prevent betrayal.</p>
+          <p>In the game, players experience the feeling of becoming a sect Leader: expanding influence, negotiating temporary alliances, surrendering, plotting, and betraying. Whether you are a Leader or a Follower, you are always looking for a way to become the most powerful sect Leader and win.</p>
+          <p>This divination site is a side use of the 36 cards from Hegemony of Faith. It is not the main board game rules; it translates the card names, effects, and imagery into a divination language.</p>
+        </div>
+
+        <aside class="game-photo-card" aria-label="game photo placeholder">
+          <div class="game-photo-placeholder">
+            <span data-about-text="photoTitle">????????</span>
+            <small data-about-text="photoHint">?????? img/hof-game-photo.jpg</small>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="reading-panel about-cta" data-lang-panel="zh">
+      <h2>????????</h2>
+      <p>????????????????????????????????????????????????????????</p>
+      <div class="about-actions">
+        <a class="primary-button link-button" href="https://www.facebook.com/hegemony.of.faith" target="_blank" rel="noopener">FB ?? / ????</a>
+        <a class="secondary-button link-button" href="https://boardgamegeek.com/boardgame/389029/hegemony-of-faith" target="_blank" rel="noopener">BoardGameGeek</a>
+        <span class="secondary-button link-button disabled-link">IG ????</span>
+      </div>
+    </section>
+
+    <section class="reading-panel about-cta" data-lang-panel="en" hidden>
+      <h2>Interested in the Cards?</h2>
+      <p>If you like the style of this deck or want updates about Hegemony of Faith, follow the official page. For purchase, use the UK store link if you are in the UK, or the international store link for other regions. You can also follow the official page for updates.</p>
+      <div class="about-actions">
+        <a class="primary-button link-button" href="https://www.allrolledup.co.uk/product/hegemony-of-faith-board-game/" target="_blank" rel="noopener">Buy in the UK</a>
+        <a class="primary-button link-button" href="https://www.tbd-gaming.com/en/products/hegemony-of-faith" target="_blank" rel="noopener">Buy Outside the UK</a>
+        <a class="secondary-button link-button" href="https://www.facebook.com/hegemony.of.faith" target="_blank" rel="noopener">Facebook Page</a>
+        <a class="secondary-button link-button" href="https://boardgamegeek.com/boardgame/389029/hegemony-of-faith" target="_blank" rel="noopener">BoardGameGeek</a>
+        <span class="secondary-button link-button disabled-link">Instagram Link Coming Later</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const aboutText = {
+      zh: {
+        title: "???????",
+        home: "?????",
+        photoTitle: "????????",
+        photoHint: "?????? img/hof-game-photo.jpg"
+      },
+      en: {
+        title: "What Is Hegemony of Faith?",
+        home: "Back to Divination",
+        photoTitle: "Game Photo Placeholder",
+        photoHint: "Can later be replaced with img/hof-game-photo.jpg"
+      }
+    };
+    let currentAboutLanguage = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "zh";
+    function applyAboutLanguage() {
+      document.documentElement.lang = currentAboutLanguage === "en" ? "en" : "zh-Hant";
+      document.title = aboutText[currentAboutLanguage].title;
+      document.querySelectorAll("[data-lang-panel]").forEach((panel) => {
+        panel.hidden = panel.dataset.langPanel !== currentAboutLanguage;
+      });
+      document.querySelectorAll("[data-about-language]").forEach((button) => {
+        const active = button.dataset.aboutLanguage === currentAboutLanguage;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      document.querySelector("[data-home-link]").textContent = aboutText[currentAboutLanguage].home;
+      document.querySelector("[data-home-link]").href = currentAboutLanguage === "en" ? "index.html?lang=en" : "index.html?lang=zh";
+      document.querySelectorAll("[data-about-text]").forEach((element) => {
+        element.textContent = aboutText[currentAboutLanguage][element.dataset.aboutText];
+      });
+    }
+    document.querySelectorAll("[data-about-language]").forEach((button) => {
+      button.addEventListener("click", () => {
+        currentAboutLanguage = button.dataset.aboutLanguage;
+        applyAboutLanguage();
+      });
+    });
+    applyAboutLanguage();
+  </script>
+</body>
+</html>
