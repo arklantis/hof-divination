@@ -345,10 +345,10 @@ const CARD_DATA = {
                       "category":  "skill",
                       "number":  14,
                       "english":  "Chaos Coming",
-                      "chinese":  "混沌降世",
-                      "upright_meaning":  "混沌降世正位代表活的混亂、出乎預料的變動、重新洗牌、亂中有機，以及對混亂本身的親和力。它表示原本穩定的規則、關係、計畫、權力結構或節奏可能被打亂，變數大量出現，舊有假設未必還能適用。原本安排好的流程、時間表、合作、關係節奏或預期結果，可能因突發事件、資訊混亂、人員變動、情緒爆發或外部環境不穩而改變。但正位的混沌不是純粹阻礙，它雖然打亂計畫，卻也可能帶來新機會、新位置、新組合、意想不到的發展，或讓原本僵化的局勢重新流動。此牌也可能表示當事人或局勢中的某股力量並不害怕混亂，甚至喜歡混亂；有人可能主動打亂局面、製造變數、破壞原本計畫，因為混亂讓事情變得有趣、刺激、有操作空間，或讓舊秩序重新分配。這不一定是惡意，但確實帶有不太在乎後果的成分。建議面上，此牌提醒暫時不宜輕舉妄動或做不可逆決定，但可以保持彈性、觀察變數、小步試探，等待混亂中的新形狀浮現；同時也建議評估自己是在善用混亂，還是只是因為喜歡混亂而忽略後果。",
-                      "reversed_meaning":  "混沌降世逆位代表混亂後的殘局、比較阻礙性的混亂、原有計畫不可行、需要重新審視與重新規劃，以及原本被忽略的後果開始浮現。當這張牌出現時，最外顯的混亂可能開始減少，但事情未必因此變輕鬆；相反地，當事人可能發現原本的安排、假設、時間表、合作方式或策略已經不適用，不能直接把舊計畫接回來，而必須重新整理條件、修正路線、處理後遺症。這張牌逆位的混亂比較不快樂：它不像正位那樣有開放性與新鮮變數，而更像是被打亂後不得不收拾、重做、補破網、面對現實阻礙。若有人先前主動製造混亂、享受變數或不在乎後果，逆位可能表示混亂的帳單開始回來，局勢不再只是好玩，而是需要承擔現實成本。若表面看似穩定，也仍需留意看不到的亂源、未處理的矛盾、人心浮動或底層隱憂。建議面上，此牌提醒不要硬套原計畫，而是先看清新的局勢，重新評估資源、位置、規則與可行路線，再決定下一步。",
-                      "notes":  "背景就是混亂與喜愛混亂的遊戲感：不太在乎後果，先把局面搞亂，自己可能因此有操作空間或覺得好玩。占卜定位為正位「亂但是有操作空間」、打亂計畫但亂中有機；逆位「亂但是要收拾」、混亂的後果浮現、原計畫不可行且需要重新規劃。與 The Prophet / 宇宙大先知逆位區分：宇宙大先知逆位是看不清或關鍵資訊未出現；混沌降世正位是混亂已經可見地發生。與 Impermanence of Life / 諸行無常區分：諸行無常是自然流動與心態順應；混沌降世是秩序被打亂、變數大量出現。可參考高塔、命運之輪、月亮、權杖五、雷諾曼雲與鞭子。",
+                      "chinese":  "混世降臨",
+                      "upright_meaning":  "混世降臨正位代表活的混亂、出乎預料的變動、重新洗牌、亂中有機，以及對混亂本身的親和力。它表示原本穩定的規則、關係、計畫、權力結構或節奏可能被打亂，變數大量出現，舊有假設未必還能適用。原本安排好的流程、時間表、合作、關係節奏或預期結果，可能因突發事件、資訊混亂、人員變動、情緒爆發或外部環境不穩而改變。但正位的混沌不是純粹阻礙，它雖然打亂計畫，卻也可能帶來新機會、新位置、新組合、意想不到的發展，或讓原本僵化的局勢重新流動。此牌也可能表示當事人或局勢中的某股力量並不害怕混亂，甚至喜歡混亂；有人可能主動打亂局面、製造變數、破壞原本計畫，因為混亂讓事情變得有趣、刺激、有操作空間，或讓舊秩序重新分配。這不一定是惡意，但確實帶有不太在乎後果的成分。建議面上，此牌提醒暫時不宜輕舉妄動或做不可逆決定，但可以保持彈性、觀察變數、小步試探，等待混亂中的新形狀浮現；同時也建議評估自己是在善用混亂，還是只是因為喜歡混亂而忽略後果。",
+                      "reversed_meaning":  "混世降臨逆位代表混亂後的殘局、比較阻礙性的混亂、原有計畫不可行、需要重新審視與重新規劃，以及原本被忽略的後果開始浮現。當這張牌出現時，最外顯的混亂可能開始減少，但事情未必因此變輕鬆；相反地，當事人可能發現原本的安排、假設、時間表、合作方式或策略已經不適用，不能直接把舊計畫接回來，而必須重新整理條件、修正路線、處理後遺症。這張牌逆位的混亂比較不快樂：它不像正位那樣有開放性與新鮮變數，而更像是被打亂後不得不收拾、重做、補破網、面對現實阻礙。若有人先前主動製造混亂、享受變數或不在乎後果，逆位可能表示混亂的帳單開始回來，局勢不再只是好玩，而是需要承擔現實成本。若表面看似穩定，也仍需留意看不到的亂源、未處理的矛盾、人心浮動或底層隱憂。建議面上，此牌提醒不要硬套原計畫，而是先看清新的局勢，重新評估資源、位置、規則與可行路線，再決定下一步。",
+                      "notes":  "背景就是混亂與喜愛混亂的遊戲感：不太在乎後果，先把局面搞亂，自己可能因此有操作空間或覺得好玩。占卜定位為正位「亂但是有操作空間」、打亂計畫但亂中有機；逆位「亂但是要收拾」、混亂的後果浮現、原計畫不可行且需要重新規劃。與 The Prophet / 宇宙大先知逆位區分：宇宙大先知逆位是看不清或關鍵資訊未出現；混世降臨正位是混亂已經可見地發生。與 Impermanence of Life / 諸行無常區分：諸行無常是自然流動與心態順應；混世降臨是秩序被打亂、變數大量出現。可參考高塔、命運之輪、月亮、權杖五、雷諾曼雲與鞭子。",
                       "reading_seed":  {
                                            "upright":  {
                                                            "core":  "混亂中有操作空間，計畫被打亂也可能冒出新機會。",
@@ -863,6 +863,39 @@ const CARD_DATA = {
 const mainCards = CARD_DATA.cards.filter((card) => card.category === "skill" || card.category === "action");
 const believerCards = CARD_DATA.cards.filter((card) => card.category === "believer");
 
+const cardImageSources = {
+  skill: "img/skill_cards_pic.png",
+  action: "img/action_cards_pic.png"
+};
+
+const cardImageOrder = {
+  action: [
+    "獵殺異端", "信仰戰爭", "煽動殉教", "散布流言",
+    "信仰辯論", "陰謀論", "大發慈悲", "堅定信仰",
+    "恩斷義絕", "信仰勸說", "情報間諜", "秘密同盟",
+    "天降神蹟", "廣善布施", "神啟"
+  ],
+  skill: [
+    "紫氣東來", "阿拉碰瓜", "唯我獨尊", "宇宙大先知",
+    "聖光復活", "雞犬升天", "永恆真理", "世界大同",
+    "真理之門", "殭屍大軍", "斷魂寶劍", "諸行無常",
+    "生命禮讚", "混世降臨", "眾生平等", "六道輪迴"
+  ]
+};
+
+const cardImageMap = Object.fromEntries(
+  Object.entries(cardImageOrder).flatMap(([category, names]) =>
+    names.map((name, index) => {
+      const column = index % 4;
+      const row = Math.floor(index / 4);
+      return [name, {
+        src: cardImageSources[category],
+        position: `${column * 33.333333}% ${row * 33.333333}%`
+      }];
+    })
+  )
+);
+
 const spreadDefinitions = {
   single: ["核心訊息"],
   three: ["局勢主軸", "影響因素", "建議方向"]
@@ -983,6 +1016,12 @@ function cardDisplayName(card) {
 
 function believerDisplayName(card) {
   return currentLanguage === "en" ? card.english : card.chinese;
+}
+
+function cardImageStyle(card) {
+  const image = cardImageMap[card.chinese];
+  if (!image) return "";
+  return ` style="--card-art: url('${image.src}'); --card-art-position: ${image.position};"`;
 }
 
 const form = document.querySelector("#reading-form");
@@ -1540,9 +1579,11 @@ function renderCard(item, type) {
         <p class="section-label">牌義摘要</p>
         <p class="meaning">${escapeHtml(firstSentences(item.meaning, 2))}</p>
       </div>`;
+  const imageStyle = cardImageStyle(item.card);
+  const imageClass = imageStyle ? " has-card-art" : "";
   return `
     <article class="card-frame compact-card">
-      <div class="card-top">
+      <div class="card-top${imageClass}"${imageStyle}>
         <span class="position-tag">${escapeHtml(uiText[currentLanguage].positions[item.spreadPosition] || item.spreadPosition)} · ${escapeHtml(uiText[currentLanguage].orientations[item.orientation] || item.orientation)}</span>
         <div class="card-name">
           <h3>${escapeHtml(cardDisplayName(item.card))}</h3>
