@@ -896,6 +896,13 @@ const cardImageMap = Object.fromEntries(
   )
 );
 
+const believerImageMap = Object.fromEntries(
+  believerCards.map((card, index) => [card.id, {
+    src: "img/believer_cards_pic.png",
+    position: `${index * 25}% 0%`
+  }])
+);
+
 const spreadDefinitions = {
   single: ["核心訊息"],
   three: ["局勢主軸", "影響因素", "建議方向"]
@@ -951,6 +958,7 @@ const uiText = {
     conclusion: "白話結論",
     copyPrompt: "複製 Prompt 給 AI 解牌",
     reset: "重新算牌",
+    aboutGameLink: "信仰霸權是什麼？",
     copied: "已複製",
     copyFailed: "複製失敗，請允許剪貼簿權限",
     cardMeaning: "牌義",
@@ -1023,6 +1031,12 @@ function cardImageStyle(card) {
   const image = cardImageMap[card.chinese];
   if (!image) return "";
   return ` style="--card-art: url('${image.src}'); --card-art-position: ${image.position};"`;
+}
+
+function believerImageStyle(card) {
+  const image = believerImageMap[card.id];
+  if (!image) return "";
+  return ` style="--believer-art: url('${image.src}'); --believer-art-position: ${image.position};"`;
 }
 
 const form = document.querySelector("#reading-form");
@@ -1582,19 +1596,22 @@ function renderCard(item, type) {
       </div>`;
   const imageStyle = cardImageStyle(item.card);
   const imageClass = imageStyle ? " has-card-art" : "";
+  const believerStyle = believerImageStyle(item.believer);
   return `
     <article class="card-frame compact-card">
       <div class="card-top${imageClass}"${imageStyle}>
-        <span class="position-tag">${escapeHtml(uiText[currentLanguage].positions[item.spreadPosition] || item.spreadPosition)} · ${escapeHtml(uiText[currentLanguage].orientations[item.orientation] || item.orientation)}</span>
+        <span class="position-tag">${escapeHtml(uiText[currentLanguage].positions[item.spreadPosition] || item.spreadPosition)} &middot; ${escapeHtml(uiText[currentLanguage].orientations[item.orientation] || item.orientation)}</span>
         <div class="card-name">
+          <p>${category} ${item.card.number}</p>
           <h3>${escapeHtml(cardDisplayName(item.card))}</h3>
         </div>
       </div>
+      <div class="card-believer-strip">
+        <span class="badge">${category} ${item.card.number}</span>
+        <span class="badge weight-${item.weight}">${escapeHtml(believerDisplayName(item.believer))} ${item.weight} &middot; ${uiText[currentLanguage].weights[item.weight]}</span>
+        <span class="believer-art"${believerStyle} aria-hidden="true"></span>
+      </div>
       <div class="card-body">
-        <div class="meta-row">
-          <span class="badge">${category} ${item.card.number}</span>
-          <span class="badge weight-${item.weight}">${escapeHtml(believerDisplayName(item.believer))} ${item.weight} · ${uiText[currentLanguage].weights[item.weight]}</span>
-        </div>
         ${cardDetail}
       </div>
     </article>
@@ -1669,6 +1686,9 @@ function applyLanguage() {
     const active = button.dataset.language === currentLanguage;
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", active ? "true" : "false");
+  });
+  document.querySelectorAll("[data-about-link]").forEach((link) => {
+    link.setAttribute("href", currentLanguage === "en" ? "about.html?lang=en" : "about.html?lang=zh");
   });
   topicButtons.forEach((button) => {
     const type = button.dataset.type || "general";
