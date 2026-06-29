@@ -1,5 +1,5 @@
 window.HOF_STATS_CONFIG = {
-  endpoint: "",
+  endpoint: "/api/stats",
   adminToken: "",
   siteId: "hof-divination"
 };
