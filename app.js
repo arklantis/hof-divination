@@ -937,6 +937,8 @@ const weightText = {
 
 const uiText = {
   zh: {
+    appTitle: "信仰霸權占卜",
+    documentTitle: "信仰霸權占卜",
     questionTypeLabel: "問題類型",
     customTopicLabel: "自訂議題",
     questionLabel: "你的問題",
@@ -971,6 +973,8 @@ const uiText = {
     typeLabels
   },
   en: {
+    appTitle: "Hegemony of Faith Divination",
+    documentTitle: "Hegemony of Faith Divination",
     questionTypeLabel: "Topic",
     customTopicLabel: "Custom Topic",
     questionLabel: "Question",
@@ -1676,6 +1680,7 @@ resultArea.addEventListener("click", async (event) => {
 
 function applyLanguage() {
   document.documentElement.lang = currentLanguage === "en" ? "en" : "zh-Hant";
+  document.title = textFor("documentTitle");
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     element.textContent = textFor(element.dataset.i18n);
   });
