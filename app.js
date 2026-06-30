@@ -1611,7 +1611,6 @@ function renderCard(item, type) {
         </div>
       </div>
       <div class="card-believer-strip">
-        <span class="badge">${category} ${item.card.number}</span>
         <span class="badge weight-${item.weight}">${escapeHtml(believerDisplayName(item.believer))} ${item.weight} &middot; ${uiText[currentLanguage].weights[item.weight]}</span>
         <span class="believer-art"${believerStyle} aria-hidden="true"></span>
       </div>
