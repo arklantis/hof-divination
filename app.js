@@ -1677,6 +1677,12 @@ resultArea.addEventListener("click", async (event) => {
   }
 });
 
+function syncLanguageUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.set("lang", currentLanguage === "en" ? "en" : "zh");
+  window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+}
+
 function applyLanguage() {
   document.documentElement.lang = currentLanguage === "en" ? "en" : "zh-Hant";
   document.title = textFor("documentTitle");
@@ -1720,6 +1726,7 @@ languageButtons.forEach((button) => {
     if (idlePanel) idlePanel.hidden = false;
     setSubmitVisible(true);
     applyLanguage();
+    syncLanguageUrl();
     trackEvent("language_changed", { selectedLanguage: currentLanguage });
   });
 });
