@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>信仰霸權占卜統計</title>
+  <title>&#20449;&#20208;&#38712;&#27402;&#21344;&#21340;&#32113;&#35336;</title>
   <link rel="stylesheet" href="styles.css?v=20260629-card-art">
 </head>
 <body>
@@ -11,23 +11,23 @@
     <section class="reading-panel">
       <div class="title-block">
         <p class="eyebrow">Private Ledger</p>
-        <h1>占卜統計</h1>
+        <h1>&#21344;&#21340;&#32113;&#35336;</h1>
       </div>
       <div class="control-grid">
         <label class="field full">
-          <span>管理 Token</span>
-          <input id="stats-token" type="password" placeholder="輸入後端設定的 token">
+          <span>&#31649;&#29702; Token</span>
+          <input id="stats-token" type="password" placeholder="&#36664;&#20837;&#31649;&#29702; token">
         </label>
         <div class="action-row full">
-          <button class="primary-button" id="load-stats-button" type="button">讀取統計</button>
+          <button class="primary-button" id="load-stats-button" type="button">&#35712;&#21462;&#32113;&#35336;</button>
         </div>
         <div class="field full">
-          <span>統計範圍</span>
-          <div class="topic-row" id="period-buttons" role="group" aria-label="統計範圍">
-            <button type="button" class="topic-button active" data-period="24h">24 小時</button>
-            <button type="button" class="topic-button" data-period="today">今日</button>
-            <button type="button" class="topic-button" data-period="7d">7 天</button>
-            <button type="button" class="topic-button" data-period="all">總體</button>
+          <span>&#32113;&#35336;&#31684;&#22285;</span>
+          <div class="topic-row" id="period-buttons" role="group" aria-label="&#32113;&#35336;&#31684;&#22285;">
+            <button type="button" class="topic-button active" data-period="24h">24 &#23567;&#26178;</button>
+            <button type="button" class="topic-button" data-period="today">&#20170;&#26085;</button>
+            <button type="button" class="topic-button" data-period="7d">7 &#22825;</button>
+            <button type="button" class="topic-button" data-period="all">&#32317;&#39636;</button>
           </div>
         </div>
       </div>
@@ -36,7 +36,7 @@
     <section class="result-area" id="stats-output">
       <div class="empty-state">
         <div class="empty-card">#</div>
-        <p>這個頁面不會從主站連出來。資料保護要靠後端 token，不要把 token 分享出去。</p>
+        <p>&#36889;&#26159;&#31169;&#20154;&#32113;&#35336;&#38913;&#12290;&#35531;&#36664;&#20837;&#31649;&#29702; token&#65292;&#20877;&#35712;&#21462;&#36039;&#26009;&#12290;</p>
       </div>
     </section>
   </main>
@@ -53,6 +53,42 @@
     const params = new URLSearchParams(location.search);
     tokenInput.value = params.get("token") || window.localStorage.getItem("hof_stats_admin_token") || config.adminToken || "";
 
+    const eventLabels = {
+      page_view: "\u9801\u9762\u700f\u89bd",
+      draw_mode_changed: "\u5207\u63db\u62bd\u724c\u65b9\u5f0f",
+      topic_selected: "\u9078\u64c7\u984c\u578b",
+      question_generated: "\u7522\u751f\u5e38\u898b\u554f\u984c",
+      reading_drawn: "\u5b8c\u6210\u62bd\u724c",
+      prompt_copied: "\u8907\u88fd AI Prompt",
+      reading_reset: "\u91cd\u65b0\u7b97\u724c",
+      reading_error: "\u62bd\u724c\u932f\u8aa4",
+      language_changed: "\u5207\u63db\u8a9e\u8a00"
+    };
+
+    const languageLabels = {
+      zh: "\u4e2d\u6587",
+      en: "\u82f1\u6587",
+      unknown: "\u672a\u77e5"
+    };
+
+    const topicLabels = {
+      general: "\u6574\u9ad4\u72c0\u6cc1",
+      love: "\u611f\u60c5\u95dc\u4fc2",
+      career: "\u5de5\u4f5c\u4e8b\u696d",
+      decision: "\u9078\u64c7\u6c7a\u7b56",
+      money: "\u91d1\u9322\u8cc7\u6e90",
+      self: "\u81ea\u6211\u72c0\u614b",
+      custom: "\u81ea\u8a02\u8b70\u984c",
+      unknown: "\u672a\u77e5"
+    };
+
+    const periodLabels = {
+      "24h": "\u6700\u8fd1 24 \u5c0f\u6642",
+      today: "\u4eca\u65e5",
+      "7d": "\u6700\u8fd1 7 \u5929",
+      all: "\u7e3d\u9ad4"
+    };
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -62,13 +98,24 @@
         .replaceAll("'", "&#039;");
     }
 
+    function labelFrom(map, value) {
+      const key = String(value || "unknown");
+      return map[key] || key || map.unknown || "\u672a\u77e5";
+    }
+
     function renderMetric(label, value) {
       return `<article class="stat-card"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value || 0)}</strong></article>`;
     }
 
+    function formatCell(row, column) {
+      const value = row[column.key];
+      if (column.format) return column.format(value, row);
+      return value;
+    }
+
     function renderTable(title, rows, columns) {
       if (!rows || rows.length === 0) {
-        return `<section class="reading-summary"><h2>${escapeHtml(title)}</h2><p class="summary-text">目前沒有資料。</p></section>`;
+        return `<section class="reading-summary"><h2>${escapeHtml(title)}</h2><p class="summary-text">\u76ee\u524d\u6c92\u6709\u8cc7\u6599\u3002</p></section>`;
       }
       return `
         <section class="reading-summary">
@@ -77,7 +124,7 @@
             <table class="stats-table">
               <thead><tr>${columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join("")}</tr></thead>
               <tbody>
-                ${rows.map((row) => `<tr>${columns.map((column) => `<td>${escapeHtml(row[column.key])}</td>`).join("")}</tr>`).join("")}
+                ${rows.map((row) => `<tr>${columns.map((column) => `<td>${escapeHtml(formatCell(row, column))}</td>`).join("")}</tr>`).join("")}
               </tbody>
             </table>
           </div>
@@ -89,46 +136,55 @@
       const totals = data.totals || {};
       output.innerHTML = `
         <section class="question-summary">
-          <p class="section-label">目前範圍</p>
-          <p class="question-line">${escapeHtml(data.periodLabel || currentPeriod)}</p>
-          <p class="topic-line">最後更新：${escapeHtml(new Date().toLocaleString())}</p>
+          <p class="section-label">\u76ee\u524d\u7bc4\u570d</p>
+          <p class="question-line">${escapeHtml(periodLabels[data.period] || data.periodLabel || currentPeriod)}</p>
+          <p class="topic-line">\u6700\u5f8c\u66f4\u65b0\uff1a${escapeHtml(new Date().toLocaleString())}</p>
         </section>
         <section class="stats-grid">
-          ${renderMetric("使用人數", data.uniqueSessions)}
-          ${renderMetric("頁面瀏覽", totals.page_view)}
-          ${renderMetric("產生問題", totals.question_generated)}
-          ${renderMetric("有輸入問題的抽牌", totals.reading_with_question)}
-          ${renderMetric("完成抽牌", totals.reading_drawn)}
-          ${renderMetric("複製 AI Prompt", totals.prompt_copied)}
+          ${renderMetric("\u4f7f\u7528\u4eba\u6578", data.uniqueSessions)}
+          ${renderMetric("\u9801\u9762\u700f\u89bd", totals.page_view)}
+          ${renderMetric("\u7522\u751f\u554f\u984c", totals.question_generated)}
+          ${renderMetric("\u6709\u8f38\u5165\u554f\u984c\u7684\u62bd\u724c", totals.reading_with_question)}
+          ${renderMetric("\u5b8c\u6210\u62bd\u724c", totals.reading_drawn)}
+          ${renderMetric("\u8907\u88fd AI Prompt", totals.prompt_copied)}
         </section>
-        ${renderTable("語言分布（完成抽牌）", data.byLanguage, [{ key: "key", label: "語言" }, { key: "count", label: "次數" }])}
-        ${renderTable("題型分布（完成抽牌）", data.byTopic, [{ key: "key", label: "題型" }, { key: "count", label: "次數" }])}
-        ${renderTable("國家/地區分布（完成抽牌）", data.byCountry, [{ key: "key", label: "國家/地區" }, { key: "count", label: "次數" }])}
-        ${renderTable("最近事件", data.recent, [
-          { key: "timestamp", label: "時間" },
-          { key: "eventName", label: "事件" },
-          { key: "language", label: "語言" },
-          { key: "questionType", label: "題型" },
-          { key: "country", label: "國家/地區" }
+        ${renderTable("\u8a9e\u8a00\u5206\u5e03\uff08\u5b8c\u6210\u62bd\u724c\uff09", data.byLanguage, [
+          { key: "key", label: "\u8a9e\u8a00", format: (value) => labelFrom(languageLabels, value) },
+          { key: "count", label: "\u6b21\u6578" }
+        ])}
+        ${renderTable("\u984c\u578b\u5206\u5e03\uff08\u5b8c\u6210\u62bd\u724c\uff09", data.byTopic, [
+          { key: "key", label: "\u984c\u578b", format: (value) => labelFrom(topicLabels, value) },
+          { key: "count", label: "\u6b21\u6578" }
+        ])}
+        ${renderTable("\u570b\u5bb6/\u5730\u5340\u5206\u5e03\uff08\u5b8c\u6210\u62bd\u724c\uff09", data.byCountry, [
+          { key: "key", label: "\u570b\u5bb6/\u5730\u5340" },
+          { key: "count", label: "\u6b21\u6578" }
+        ])}
+        ${renderTable("\u6700\u8fd1\u4e8b\u4ef6", data.recent, [
+          { key: "timestamp", label: "\u6642\u9593" },
+          { key: "eventName", label: "\u4e8b\u4ef6", format: (value) => labelFrom(eventLabels, value) },
+          { key: "language", label: "\u8a9e\u8a00", format: (value) => labelFrom(languageLabels, value) },
+          { key: "questionType", label: "\u984c\u578b", format: (value) => labelFrom(topicLabels, value) },
+          { key: "country", label: "\u570b\u5bb6/\u5730\u5340" }
         ])}
       `;
     }
 
     async function loadStats() {
       if (!config.endpoint) {
-        output.innerHTML = `<div class="empty-state"><div class="empty-card">!</div><p>尚未設定 stats-config.js 的 endpoint。</p></div>`;
+        output.innerHTML = `<div class="empty-state"><div class="empty-card">!</div><p>\u5c1a\u672a\u8a2d\u5b9a stats-config.js \u7684 endpoint\u3002</p></div>`;
         return;
       }
       const token = tokenInput.value.trim();
       window.localStorage.setItem("hof_stats_admin_token", token);
-      output.innerHTML = `<div class="empty-state"><div class="empty-card">...</div><p>讀取中。</p></div>`;
+      output.innerHTML = `<div class="empty-state"><div class="empty-card">...</div><p>\u8b80\u53d6\u4e2d...</p></div>`;
       const url = `${config.endpoint}?mode=summary&period=${encodeURIComponent(currentPeriod)}&token=${encodeURIComponent(token)}`;
       try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         renderStats(await response.json());
       } catch (error) {
-        output.innerHTML = `<div class="empty-state"><div class="empty-card">!</div><p>讀取失敗：${escapeHtml(error.message)}</p></div>`;
+        output.innerHTML = `<div class="empty-state"><div class="empty-card">!</div><p>\u8b80\u53d6\u5931\u6557\uff1a${escapeHtml(error.message)}</p></div>`;
       }
     }
 
