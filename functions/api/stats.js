@@ -93,16 +93,19 @@ async function handlePost(request, env) {
   return json({ ok: true });
 }
 
-async function countBy(db, column, where) {
+async function countBy(db, column, where, eventName = "reading_drawn") {
+  const eventFilter = eventName ? `${where.clause ? " AND" : "WHERE"} event_name = ?` : "";
+  const params = eventName ? [...where.params, eventName] : where.params;
   const query = `
     SELECT COALESCE(NULLIF(${column}, ''), 'unknown') AS key, COUNT(*) AS count
     FROM events
     ${where.clause}
+    ${eventFilter}
     GROUP BY key
     ORDER BY count DESC
     LIMIT 20
   `;
-  const result = await db.prepare(query).bind(...where.params).all();
+  const result = await db.prepare(query).bind(...params).all();
   return result.results || [];
 }
 
