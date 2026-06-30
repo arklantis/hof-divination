@@ -173,6 +173,7 @@
 
     function renderStats(data) {
       const totals = data.totals || {};
+      const conversions = data.byConversionTarget || [];
       output.innerHTML = `
         <section class="question-summary">
           <p class="section-label">\u76ee\u524d\u7bc4\u570d</p>
