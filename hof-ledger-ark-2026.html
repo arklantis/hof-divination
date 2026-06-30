@@ -115,6 +115,23 @@
     }
 
 
+    function detailTargetKey(value) {
+      if (!value) return "unknown";
+      try {
+        const data = typeof value === "string" ? JSON.parse(value) : value;
+        return data.target || "unknown";
+      } catch {
+        return String(value || "unknown");
+      }
+    }
+
+    function conversionCount(rows, targets) {
+      const targetSet = new Set(targets);
+      return (rows || []).reduce((total, row) => {
+        return targetSet.has(detailTargetKey(row.key)) ? total + Number(row.count || 0) : total;
+      }, 0);
+    }
+
     function detailTargetLabel(value) {
       if (!value) return "";
       try {
@@ -166,9 +183,11 @@
           ${renderMetric("\u4f7f\u7528\u4eba\u6578", data.uniqueSessions)}
           ${renderMetric("\u5b8c\u6210\u62bd\u724c", totals.reading_drawn)}
           ${renderMetric("\u8907\u88fd AI Prompt", totals.prompt_copied)}
-          ${renderMetric("\u9ede\u4ecb\u7d39\u9801\u9023\u7d50", totals.about_link_clicked)}
+          ${renderMetric("\u4e3b\u9801\u9032\u5165\u4ecb\u7d39\u9801", totals.about_link_clicked)}
           ${renderMetric("\u4ecb\u7d39\u9801\u700f\u89bd", totals.about_page_view)}
-          ${renderMetric("\u5c0e\u6d41\u9023\u7d50\u9ede\u64ca", totals.outbound_clicked)}
+          ${renderMetric("FB \u9ede\u64ca", conversionCount(conversions, ["facebook"]))}
+          ${renderMetric("IG \u9ede\u64ca", conversionCount(conversions, ["instagram"]))}
+          ${renderMetric("\u8cfc\u8cb7\u9801\u9ede\u64ca", conversionCount(conversions, ["buy_uk", "buy_international"]))}
         </section>
         ${renderTable("\u8a9e\u8a00\u5206\u5e03\uff08\u5b8c\u6210\u62bd\u724c\uff09", data.byLanguage, [
           { key: "key", label: "\u8a9e\u8a00", format: (value) => labelFrom(languageLabels, value) },
@@ -182,7 +201,7 @@
           { key: "key", label: "\u570b\u5bb6/\u5730\u5340" },
           { key: "count", label: "\u6b21\u6578" }
         ])}
-        ${renderTable("\u5c0e\u6d41\u9ede\u64ca\u7d71\u8a08", data.byConversionTarget, [
+        ${renderTable("\u5c0e\u6d41\u9ede\u64ca\u7d71\u8a08\uff08\u5206\u958b\u8a08\u7b97\uff09", data.byConversionTarget, [
           { key: "key", label: "\u9023\u7d50", format: (value) => detailTargetLabel(value) },
           { key: "count", label: "\u6b21\u6578" }
         ])}
