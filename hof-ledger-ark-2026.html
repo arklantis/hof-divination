@@ -82,6 +82,17 @@
       unknown: "\u672a\u77e5"
     };
 
+
+    const outboundTargetLabels = {
+      facebook: "Facebook \u7c89\u5c08",
+      instagram: "Instagram",
+      bgg: "BoardGameGeek",
+      buy_uk: "UK \u8cfc\u8cb7\u9801",
+      buy_international: "\u5176\u4ed6\u5730\u5340\u8cfc\u8cb7\u9801",
+      about_game: "\u4fe1\u4ef0\u9738\u6b0a\u662f\u4ec0\u9ebc",
+      unknown: "\u672a\u77e5"
+    };
+
     const periodLabels = {
       "24h": "\u6700\u8fd1 24 \u5c0f\u6642",
       today: "\u4eca\u65e5",
@@ -101,6 +112,17 @@
     function labelFrom(map, value) {
       const key = String(value || "unknown");
       return map[key] || key || map.unknown || "\u672a\u77e5";
+    }
+
+
+    function detailTargetLabel(value) {
+      if (!value) return "";
+      try {
+        const data = typeof value === "string" ? JSON.parse(value) : value;
+        return labelFrom(outboundTargetLabels, data.target);
+      } catch {
+        return value;
+      }
     }
 
     function renderMetric(label, value) {
@@ -142,11 +164,11 @@
         </section>
         <section class="stats-grid">
           ${renderMetric("\u4f7f\u7528\u4eba\u6578", data.uniqueSessions)}
-          ${renderMetric("\u9801\u9762\u700f\u89bd", totals.page_view)}
-          ${renderMetric("\u7522\u751f\u554f\u984c", totals.question_generated)}
-          ${renderMetric("\u6709\u8f38\u5165\u554f\u984c\u7684\u62bd\u724c", totals.reading_with_question)}
           ${renderMetric("\u5b8c\u6210\u62bd\u724c", totals.reading_drawn)}
           ${renderMetric("\u8907\u88fd AI Prompt", totals.prompt_copied)}
+          ${renderMetric("\u9ede\u4ecb\u7d39\u9801\u9023\u7d50", totals.about_link_clicked)}
+          ${renderMetric("\u4ecb\u7d39\u9801\u700f\u89bd", totals.about_page_view)}
+          ${renderMetric("\u5c0e\u6d41\u9023\u7d50\u9ede\u64ca", totals.outbound_clicked)}
         </section>
         ${renderTable("\u8a9e\u8a00\u5206\u5e03\uff08\u5b8c\u6210\u62bd\u724c\uff09", data.byLanguage, [
           { key: "key", label: "\u8a9e\u8a00", format: (value) => labelFrom(languageLabels, value) },
@@ -158,6 +180,10 @@
         ])}
         ${renderTable("\u570b\u5bb6/\u5730\u5340\u5206\u5e03\uff08\u5b8c\u6210\u62bd\u724c\uff09", data.byCountry, [
           { key: "key", label: "\u570b\u5bb6/\u5730\u5340" },
+          { key: "count", label: "\u6b21\u6578" }
+        ])}
+        ${renderTable("\u5c0e\u6d41\u9ede\u64ca\u7d71\u8a08", data.byConversionTarget, [
+          { key: "key", label: "\u9023\u7d50", format: (value) => detailTargetLabel(value) },
           { key: "count", label: "\u6b21\u6578" }
         ])}
         ${renderTable("\u6700\u8fd1\u4e8b\u4ef6", data.recent, [

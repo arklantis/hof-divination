@@ -150,10 +150,27 @@ async function handleGet(request, env) {
     ${where.clause}
   `).bind(...where.params).first();
 
+  const conversionTargets = await db.prepare(`
+    SELECT
+      CASE
+        WHEN event_name = 'about_link_clicked' THEN '{"target":"about_game"}'
+        ELSE COALESCE(NULLIF(detail, ''), '{"target":"unknown"}')
+      END AS key,
+      COUNT(*) AS count
+    FROM events
+    ${where.clause}
+    ${where.clause ? " AND" : "WHERE"} event_name IN ('about_link_clicked', 'outbound_clicked')
+    GROUP BY key
+    ORDER BY count DESC
+    LIMIT 20
+  `).bind(...where.params).all();
+
+  const recentFilter = `${where.clause ? " AND" : "WHERE"} event_name NOT IN ('about_link_clicked', 'about_page_view', 'outbound_clicked', 'language_changed')`;
   const recent = await db.prepare(`
     SELECT created_at AS timestamp, event_name AS eventName, language, question_type AS questionType, country
     FROM events
     ${where.clause}
+    ${recentFilter}
     ORDER BY created_at DESC
     LIMIT 50
   `).bind(...where.params).all();
@@ -167,6 +184,7 @@ async function handleGet(request, env) {
     byLanguage: await countBy(db, "language", where),
     byTopic: await countBy(db, "question_type", where),
     byCountry: await countBy(db, "country", where),
+    byConversionTarget: conversionTargets.results || [],
     recent: recent.results || []
   });
 }

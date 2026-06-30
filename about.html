@@ -48,9 +48,9 @@
       <h2>對這套牌有興趣？</h2>
       <p>如果你喜歡這套牌的風格，或想知道《信仰霸權》的上市、活動與購買資訊，可以追蹤粉專；想購買也可以直接聯繫粉專詢問。</p>
       <div class="about-actions">
-        <a class="primary-button link-button" href="https://www.facebook.com/hegemony.of.faith" target="_blank" rel="noopener">FB 粉專 / 購買詢問</a>
-        <a class="secondary-button link-button" href="https://boardgamegeek.com/boardgame/389029/hegemony-of-faith" target="_blank" rel="noopener">BoardGameGeek</a>
-        <a class="secondary-button link-button" href="https://www.instagram.com/hegemony.of.faith/" target="_blank" rel="noopener">Instagram</a>
+        <a class="primary-button link-button" href="https://www.facebook.com/hegemony.of.faith" data-outbound-target="facebook" target="_blank" rel="noopener">FB 粉專 / 購買詢問</a>
+        <a class="secondary-button link-button" href="https://boardgamegeek.com/boardgame/389029/hegemony-of-faith" data-outbound-target="bgg" target="_blank" rel="noopener">BoardGameGeek</a>
+        <a class="secondary-button link-button" href="https://www.instagram.com/hegemony.of.faith/" data-outbound-target="instagram" target="_blank" rel="noopener">Instagram</a>
       </div>
     </section>
 
@@ -58,16 +58,58 @@
       <h2>Interested in the Cards?</h2>
       <p>For purchase, use the UK store link if you are in the UK, or the international store link for other regions. You can also follow the official page for updates.</p>
       <div class="about-actions">
-        <a class="primary-button link-button" href="https://www.allrolledup.co.uk/product/hegemony-of-faith-board-game/" target="_blank" rel="noopener">Buy in the UK</a>
-        <a class="primary-button link-button" href="https://www.tbd-gaming.com/en/products/hegemony-of-faith" target="_blank" rel="noopener">Buy Outside the UK</a>
-        <a class="secondary-button link-button" href="https://www.facebook.com/hegemony.of.faith" target="_blank" rel="noopener">Facebook Page</a>
-        <a class="secondary-button link-button" href="https://boardgamegeek.com/boardgame/389029/hegemony-of-faith" target="_blank" rel="noopener">BoardGameGeek</a>
-        <a class="secondary-button link-button" href="https://www.instagram.com/hegemony.of.faith/" target="_blank" rel="noopener">Instagram</a>
+        <a class="primary-button link-button" href="https://www.allrolledup.co.uk/product/hegemony-of-faith-board-game/" data-outbound-target="buy_uk" target="_blank" rel="noopener">Buy in the UK</a>
+        <a class="primary-button link-button" href="https://www.tbd-gaming.com/en/products/hegemony-of-faith" data-outbound-target="buy_international" target="_blank" rel="noopener">Buy Outside the UK</a>
+        <a class="secondary-button link-button" href="https://www.facebook.com/hegemony.of.faith" data-outbound-target="facebook" target="_blank" rel="noopener">Facebook Page</a>
+        <a class="secondary-button link-button" href="https://boardgamegeek.com/boardgame/389029/hegemony-of-faith" data-outbound-target="bgg" target="_blank" rel="noopener">BoardGameGeek</a>
+        <a class="secondary-button link-button" href="https://www.instagram.com/hegemony.of.faith/" data-outbound-target="instagram" target="_blank" rel="noopener">Instagram</a>
       </div>
     </section>
   </main>
-
+  <script src="stats-config.js?v=20260629-cloudflare-stats"></script>
   <script>
+    const aboutStatsConfig = window.HOF_STATS_CONFIG || {};
+    const aboutStatsSessionId = (() => {
+      const key = "hof_stats_session_id";
+      const existing = window.localStorage?.getItem(key);
+      if (existing) return existing;
+      const value = crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(36).slice(2);
+      window.localStorage?.setItem(key, value);
+      return value;
+    })();
+
+    function trackAboutEvent(eventName, detail = {}) {
+      if (!aboutStatsConfig.endpoint) return;
+      const locale = navigator.language || "";
+      const localeRegion = locale.includes("-") ? locale.split("-").pop().toUpperCase() : "";
+      const payload = {
+        siteId: aboutStatsConfig.siteId || "hof-divination",
+        eventName,
+        sessionId: aboutStatsSessionId,
+        language: currentAboutLanguage,
+        questionType: "about",
+        hasCustomTopic: false,
+        readingMode: "about",
+        path: location.pathname,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+        browserLocale: locale,
+        browserRegion: localeRegion,
+        timestamp: new Date().toISOString(),
+        detail
+      };
+      const body = JSON.stringify(payload);
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(aboutStatsConfig.endpoint, new Blob([body], { type: "text/plain" }));
+        return;
+      }
+      fetch(aboutStatsConfig.endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body
+      }).catch(() => {});
+    }
+
     const aboutText = {
       zh: {
         title: "信仰霸權是什麼",
@@ -83,6 +125,13 @@
       }
     };
     let currentAboutLanguage = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "zh";
+
+    function syncAboutLanguageUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", currentAboutLanguage === "en" ? "en" : "zh");
+      window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+    }
+
     function applyAboutLanguage() {
       document.documentElement.lang = currentAboutLanguage === "en" ? "en" : "zh-Hant";
       document.title = aboutText[currentAboutLanguage].title;
@@ -94,19 +143,33 @@
         button.classList.toggle("active", active);
         button.setAttribute("aria-pressed", active ? "true" : "false");
       });
-      document.querySelector("[data-home-link]").textContent = aboutText[currentAboutLanguage].home;
-      document.querySelector("[data-home-link]").href = currentAboutLanguage === "en" ? "index.html?lang=en" : "index.html?lang=zh";
+      const homeLink = document.querySelector("[data-home-link]");
+      if (homeLink) {
+        homeLink.textContent = aboutText[currentAboutLanguage].home;
+        homeLink.href = currentAboutLanguage === "en" ? "index.html?lang=en" : "index.html?lang=zh";
+      }
       document.querySelectorAll("[data-about-text]").forEach((element) => {
         element.textContent = aboutText[currentAboutLanguage][element.dataset.aboutText];
       });
     }
+
     document.querySelectorAll("[data-about-language]").forEach((button) => {
       button.addEventListener("click", () => {
         currentAboutLanguage = button.dataset.aboutLanguage;
         applyAboutLanguage();
+        syncAboutLanguageUrl();
+        trackAboutEvent("language_changed", { selectedLanguage: currentAboutLanguage });
       });
     });
+
+    document.querySelectorAll("[data-outbound-target]").forEach((link) => {
+      link.addEventListener("click", () => {
+        trackAboutEvent("outbound_clicked", { target: link.dataset.outboundTarget || "unknown" });
+      });
+    });
+
     applyAboutLanguage();
+    trackAboutEvent("about_page_view");
   </script>
 </body>
 </html>

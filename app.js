@@ -1890,5 +1890,13 @@ function resetReading() {
   setSubmitVisible(true);
 }
 
+
+
+document.querySelectorAll("[data-about-link]").forEach((link) => {
+  link.addEventListener("click", () => {
+    trackEvent("about_link_clicked", { target: "about_game" });
+  });
+});
+
 applyLanguage();
 trackEvent("page_view");
